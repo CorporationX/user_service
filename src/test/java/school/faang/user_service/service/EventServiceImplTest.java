@@ -18,11 +18,21 @@ import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.entity.event.EventStatus;
 import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceImplTest {
@@ -43,7 +53,8 @@ class EventServiceImplTest {
     private EventServiceImpl eventService;
 
     @Test
-    void createEvent_shouldMapDtoToEntity_SaveEntity_ThenMapToDto() {
+    void createEventTest() {
+        // Arrange
         EventDto inputDto = new EventDto(
                 "Test Event",
                 "Some description",
@@ -56,28 +67,21 @@ class EventServiceImplTest {
                 EventStatus.PLANNED
         );
 
-//     eventService.create(new EventDto("Test Event",
-//             "Some description",
-//             LocalDateTime.now().plusDays(1),
-//             LocalDateTime.now().plusDays(2),
-//             123L,
-//             LocalDateTime.now(),
-//             LocalDateTime.now(),
-//             EventType.WEBINAR,
-//             EventStatus.PLANNED));
+        Event savedEvent = new Event();
+        savedEvent.setTitle("Test Event");
 
-        Event mappedEvent = eventMapper.toEvent(inputDto);
-        when(eventRepository.save(any(Event.class))).thenReturn(mappedEvent);
-        verify(eventRepository).save(any(Event.class));
-
+        when(eventRepository.save(any(Event.class))).thenReturn(savedEvent);
         EventDto result = eventService.create(inputDto);
+        verify(eventRepository).save(any(Event.class));
 
         assertNotNull(result);
         assertEquals(inputDto.getTitle(), result.getTitle());
     }
 
+
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @Test
-    void updateEvent_shouldMapDtoToEntity_SaveEntity_ThenMapToDto() {
+    void updateEventTest() {
         long eventId = 1L;
 
         Event existingEvent = new Event(
@@ -91,12 +95,11 @@ class EventServiceImplTest {
                 new ArrayList<>(),
                 new ArrayList<>(),
                 new User(),
-        new ArrayList<>(),
+                new ArrayList<>(),
                 EventType.WEBINAR,
                 EventStatus.PLANNED,
                 LocalDateTime.now().minusDays(1),
-                LocalDateTime.now().minusDays(1)
-);
+                LocalDateTime.now().minusDays(1));
 
         UpdateEventDto updateDto = new UpdateEventDto(
                 "New title",
@@ -123,8 +126,6 @@ class EventServiceImplTest {
 
         when(eventRepository.findById(eventId)).thenReturn(Optional.of(existingEvent));
         when(eventRepository.save(existingEvent)).thenReturn(existingEvent);
-        doNothing().when(eventMapper).update(updateDto, existingEvent);
-        when(eventMapper.toEventDto(existingEvent)).thenReturn(expectedDto);
 
         EventDto result = eventService.update(eventId, updateDto);
 
@@ -132,9 +133,7 @@ class EventServiceImplTest {
         assertEquals(expectedDto, result);
 
         verify(eventRepository).findById(eventId);
-        verify(eventMapper).update(updateDto, existingEvent);
         verify(eventRepository).save(existingEvent);
-        verify(eventMapper).toEventDto(existingEvent);
     }
 
     @Test
@@ -193,7 +192,6 @@ class EventServiceImplTest {
                 event2.getCreatedAt(), event2.getUpdatedAt(),
                 event2.getEventType(), event2.getStatus()
         );
-        doReturn(eventDto2).when(eventMapper).toEventDto(event2);
 
         List<EventDto> result = eventService.getByFilters(filterDto);
 
@@ -204,11 +202,10 @@ class EventServiceImplTest {
         verify(filter1).isApplicable(filterDto);
         verify(filter1).apply(any(Stream.class), eq(filterDto));
         verify(filter2).isApplicable(filterDto);
-        verify(eventMapper).toEventDto(event2);
     }
 
     @Test
-    void DeleteById() {
+    void deleteById() {
 
         long eventId = 42L;
 
@@ -216,7 +213,6 @@ class EventServiceImplTest {
 
         verify(eventRepository).deleteById(eventId);
     }
-
 }
 
 

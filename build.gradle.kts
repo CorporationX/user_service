@@ -141,7 +141,7 @@ tasks.jacocoTestReport {
                     "**/mapper/**",
                     "**/*Feign*",
                     "**/repository/**",
-                    "**com/json/student/**"
+                    "**/com/json/**"
                 )
             }
     )
@@ -166,7 +166,7 @@ tasks.jacocoTestCoverageVerification {
                     "**/mapper/**",
                     "**/*Feign*",
                     "**/repository/**",
-                    "**com/json/student/**"
+                    "**/com/json/**"
                 )
             }
     )

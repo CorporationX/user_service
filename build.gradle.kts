@@ -3,6 +3,7 @@ plugins {
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
+    id("jacoco")
     kotlin("jvm")
     checkstyle
 }
@@ -115,4 +116,16 @@ tasks.checkstyleTest {
     include("**/*.java")
 
     classpath = files()
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
 }

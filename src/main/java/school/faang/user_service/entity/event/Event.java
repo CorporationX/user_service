@@ -15,6 +15,9 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,10 +26,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.user.Skill;
 import school.faang.user_service.entity.user.User;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
@@ -76,7 +75,7 @@ public class Event {
 
     @Column(name = "type")
     @Enumerated(EnumType.ORDINAL)
-    private EventType type;
+    private EventType eventType;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.ORDINAL)

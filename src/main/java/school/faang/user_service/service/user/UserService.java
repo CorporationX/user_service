@@ -4,6 +4,8 @@ import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.dto.user.UpdateUserDto;
 import school.faang.user_service.dto.user.UserDto;
 
+import java.util.List;
+
 /**
  * Сервис для управления пользователями.
  * Предоставляет методы для создания, обновления и получения информации о пользователях.
@@ -39,7 +41,7 @@ public interface UserService {
      *         иначе выбрасывается {@code DataIntegrityViolationException}.</li>
      * </ul>
      *
-     * @param userId идентификатор пользователя, чьи данные необходимо обновить
+     * @param userId  идентификатор пользователя, чьи данные необходимо обновить
      * @param userDto объект {@link UpdateUserDto}, содержащий обновлённые данные пользователя
      * @return объект {@link UserDto}, представляющий обновлённого пользователя
      */
@@ -55,6 +57,28 @@ public interface UserService {
      * @return объект {@link UserDto}, содержащий данные пользователя
      */
     UserDto getById(long userId);
+
+    /**
+     * Возвращает пользователя по его идентификатору.
+     * <p>
+     * Если пользователь с указанным идентификатором не найден,
+     * выбрасывается {@code EntityNotFoundException}.
+     *
+     * @param userId идентификатор пользователя
+     * @return объект {@link UserDto}, представляющий пользователя
+     */
+    UserDto getUser(long userId);
+
+    /**
+     * Возвращает список всех объектов User, каждый из которых имеет id совпадающий с одним id из переданного списка.
+     * <p>
+     * Если User с одним id из списка не найден в БД,
+     * то он просто игнорируется и не добавляется в результирующий список.
+     *
+     * @param ids список id пользователей
+     * @return список объектов {@link UserDto}, представляющих пользователей.
+     */
+    List<UserDto> getUsersByIds(List<Long> ids);
 }
 
 

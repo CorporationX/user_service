@@ -1,6 +1,8 @@
 package school.faang.user_service.controller.mentorship;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,13 @@ public class MentorshipController {
     private final UserContext userContext;
 
     @PostMapping("/{mentorId}/{menteeId}")
+    @Parameter(
+            name = "x-user-id",
+            description = "ID текущего пользователя",
+            required = true,
+            in = ParameterIn.HEADER,
+            example = "123"
+    )
     @Operation(
             summary = "Добавить связь ментор-менти",
             description = "Создаёт связь между ментором и менти. "
@@ -61,6 +70,13 @@ public class MentorshipController {
     }
 
     @DeleteMapping("/{mentorId}/{menteeId}")
+    @Parameter(
+            name = "x-user-id",
+            description = "ID текущего пользователя",
+            required = true,
+            in = ParameterIn.HEADER,
+            example = "123"
+    )
     @Operation(
             summary = "Удалить связь ментор-менти",
             description = "Удаляет существующую связь между ментором и менти. "
@@ -87,6 +103,13 @@ public class MentorshipController {
     }
 
     @GetMapping("/mentee/{userId}")
+    @Parameter(
+            name = "x-user-id",
+            description = "ID текущего пользователя",
+            required = true,
+            in = ParameterIn.HEADER,
+            example = "123"
+    )
     @Operation(
             summary = "Получить список менти",
             description = "Возвращает всех менти (учеников) указанного пользователя (ментора)."
@@ -96,6 +119,13 @@ public class MentorshipController {
     }
 
     @GetMapping("/mentor/{userId}")
+    @Parameter(
+            name = "x-user-id",
+            description = "ID текущего пользователя",
+            required = true,
+            in = ParameterIn.HEADER,
+            example = "123"
+    )
     @Operation(
             summary = "Получить список менторов",
             description = "Возвращает всех менторов указанного пользователя (менти)."

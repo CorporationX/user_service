@@ -54,7 +54,7 @@ public interface UserService {
      * @param userId идентификатор пользователя
      * @return объект {@link UserDto}, содержащий данные пользователя
      */
-    UserDto getById(long userId);
+    UserDto getUserById(long userId);
 }
 
 

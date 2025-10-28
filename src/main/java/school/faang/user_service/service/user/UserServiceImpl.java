@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.dto.user.UpdateUserDto;
@@ -29,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final UserContext userContext;
 
     @Override
+    @Transactional
     public UserDto create(CreateUserDto userDto) {
         if (userDto.password().length() < minPasswordLength) {
             throw new DataValidationException("Password should be more than " + minPasswordLength + " symbols!");
@@ -42,6 +44,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto update(long userId, UpdateUserDto userDto) {
         long requesterId = userContext.getUserId();
         if (userId != requesterId) {
@@ -57,7 +60,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getById(long userId) {
+    @Transactional
+    public UserDto getUserById(long userId) {
         User user = userRepository.getByIdOrThrow(userId);
         return userMapper.toUserDto(user);
     }

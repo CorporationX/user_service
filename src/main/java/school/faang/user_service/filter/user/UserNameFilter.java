@@ -1,6 +1,7 @@
 package school.faang.user_service.filter.user;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import school.faang.user_service.dto.user.UserFiltersDto;
 import school.faang.user_service.entity.user.User;
 
@@ -11,7 +12,7 @@ public class UserNameFilter implements UserFilter {
 
     @Override
     public boolean isApplicable(UserFiltersDto userFiltersDto) {
-        return userFiltersDto.namePattern() != null && !userFiltersDto.namePattern().isEmpty();
+        return StringUtils.hasText(userFiltersDto.namePattern());
     }
 
     @Override

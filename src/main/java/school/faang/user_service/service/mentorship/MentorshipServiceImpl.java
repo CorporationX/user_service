@@ -6,7 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.User;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.ConflictException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
@@ -38,7 +39,7 @@ public class MentorshipServiceImpl implements MentorshipService {
 
         if (alreadyExists) {
             log.info("Mentorship already exists: mentorId={}, menteeId={}", mentorId, menteeId);
-            throw new DataValidationException("Связь уже существует");
+            throw new ConflictException("Связь уже существует");
         }
 
         mentors.add(mentor);
@@ -62,7 +63,7 @@ public class MentorshipServiceImpl implements MentorshipService {
 
         if (!removed) {
             log.warn("Mentorship not found: mentorId={}, menteeId={}", mentorId, menteeId);
-            throw new DataValidationException("Связь не найдена");
+            throw new EntityNotFoundException("Связь не найдена");
         }
 
         mentorshipRepository.save(mentee);

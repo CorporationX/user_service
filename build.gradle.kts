@@ -5,6 +5,7 @@ plugins {
     id("org.jsonschema2pojo") version "1.2.1"
     kotlin("jvm")
     checkstyle
+    jacoco
 }
 
 group = "faang.school"
@@ -116,4 +117,65 @@ tasks.checkstyleTest {
     include("**/*.java")
 
     classpath = files()
+}
+
+jacoco {
+    toolVersion = "0.8.14"
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    classDirectories.setFrom(
+        project.layout.projectDirectory.dir("build/classes/java/main")
+            .asFileTree
+            .matching {
+                exclude(
+                    "**/config/**",
+                    "**/dto/**",
+                    "**/entity/**",
+                    "**/*Application*",
+                    "**/exception/**",
+                    "**/mapper/**",
+                    "**/*Feign*",
+                    "**/repository/**",
+                    "**/com/json/**"
+                )
+            }
+    )
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.test)
+    classDirectories.setFrom(
+        project.layout.projectDirectory.dir("build/classes/java/main")
+            .asFileTree
+            .matching {
+                exclude(
+                    "**/config/**",
+                    "**/dto/**",
+                    "**/entity/**",
+                    "**/*Application*",
+                    "**/exception/**",
+                    "**/mapper/**",
+                    "**/*Feign*",
+                    "**/repository/**",
+                    "**/com/json/**"
+                )
+            }
+    )
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.7.toBigDecimal()
+            }
+        }
+    }
 }

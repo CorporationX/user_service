@@ -122,7 +122,7 @@ class EventServiceImplTest {
 
     @Test
     void getByFilters() {
-        // в разработке
+        // TODO: реализовать метод getByFilters
     }
 
     @Test

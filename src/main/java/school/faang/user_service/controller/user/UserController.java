@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.dto.user.UpdateUserDto;
@@ -28,6 +29,7 @@ import java.util.List;
 @Tag(name = "Users", description = "Операции с пользователями")
 @Slf4j
 @Validated
+@RequestMapping("/users")
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -55,7 +57,7 @@ public class UserController {
     @Operation(summary = "Получить пользователя по id")
     @ApiResponse(responseCode = "200", description = "OK",
             content = @Content(schema = @Schema(implementation = UserDto.class)))
-    @GetMapping("/users/{userId}")
+    @GetMapping("/{userId}")
     public UserDto getUser(
             @PathVariable
             @Min(1) long userId) {
@@ -65,7 +67,7 @@ public class UserController {
     @Operation(summary = "Получить список пользователей по списку id")
     @ApiResponse(responseCode = "200", description = "OK",
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserDto.class))))
-    @PostMapping("/users")
+    @PostMapping
     public List<UserDto> getUsersByIds(
             @RequestBody
             @NotEmpty List<@Min(1) Long> ids) {

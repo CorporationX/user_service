@@ -1,5 +1,6 @@
 package school.faang.user_service.dto.event;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -31,9 +32,12 @@ public class EventDto {
     @NotNull
     private LocalDateTime updatedAt;
 
+    @Min(1)
+    private Long ownerId;
+
     @NotNull
     private EventType eventType;
 
     @NotNull
-    private EventStatus eventStatus;
+    private EventStatus status;
 }

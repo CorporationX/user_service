@@ -79,7 +79,7 @@ public class Event {
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.ORDINAL)
-    private EventStatus eventStatus;
+    private EventStatus status;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

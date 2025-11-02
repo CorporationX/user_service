@@ -11,8 +11,9 @@ import java.time.LocalDateTime;
 public class UpdateEventDto {
     private String title;
     private String description;
+    private Long ownerId;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private EventType eventType;
-    private EventStatus eventStatus;
+    private EventStatus status;
 }

@@ -19,13 +19,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceImplTest {
@@ -49,6 +47,7 @@ class EventServiceImplTest {
                 LocalDateTime.now().plusDays(2),
                 LocalDateTime.now(),
                 LocalDateTime.now(),
+                1L,
                 EventType.WEBINAR,
                 EventStatus.PLANNED
         );
@@ -63,7 +62,6 @@ class EventServiceImplTest {
         assertNotNull(result);
         assertEquals(inputDto.getTitle(), result.getTitle());
     }
-
 
     @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @Test
@@ -90,6 +88,7 @@ class EventServiceImplTest {
         UpdateEventDto updateDto = new UpdateEventDto(
                 "New title",
                 "New desc",
+                1L,
                 LocalDateTime.now().plusDays(2),
                 LocalDateTime.now().plusDays(3),
                 EventType.MEETING,
@@ -103,8 +102,9 @@ class EventServiceImplTest {
                 updateDto.getEndDate(),
                 existingEvent.getCreatedAt(),
                 existingEvent.getUpdatedAt(),
+                updateDto.getOwnerId(),
                 updateDto.getEventType(),
-                updateDto.getEventStatus()
+                updateDto.getStatus()
 
         );
 
@@ -135,6 +135,3 @@ class EventServiceImplTest {
         verify(eventRepository).deleteById(eventId);
     }
 }
-
-
-

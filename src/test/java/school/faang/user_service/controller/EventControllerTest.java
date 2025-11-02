@@ -14,7 +14,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 
-
 @ExtendWith(MockitoExtension.class)
 public class EventControllerTest {
 

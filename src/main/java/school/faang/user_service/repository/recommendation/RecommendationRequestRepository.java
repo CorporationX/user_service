@@ -11,11 +11,13 @@ public interface RecommendationRequestRepository extends JpaRepository<Recommend
 
     @Query(nativeQuery = true, value = """
             SELECT * FROM recommendation_request
-            WHERE requester_id = ?1 AND receiver_id = ?2
+            WHERE requester_id = ?1 AND receiver_id = ?2 AND status = ?3
             ORDER BY created_at DESC
             LIMIT 1
             """)
-    Optional<RecommendationRequest> findLatestPendingRequest(long requesterId, long receiverId);
+    Optional<RecommendationRequest> findLatestRequestByReceiverAndRequesterAndStatus(long requesterId,
+                                                                                     long receiverId,
+                                                                                     int status);
 
     default RecommendationRequest getByIdOrThrow(long requestId) {
         return findById(requestId).orElseThrow(

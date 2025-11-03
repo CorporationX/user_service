@@ -16,23 +16,23 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.user.Skill;
 import school.faang.user_service.entity.user.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "recommendation_request")
 public class RecommendationRequest {
@@ -64,7 +64,7 @@ public class RecommendationRequest {
     private Recommendation recommendation;
 
     @OneToMany(mappedBy = "request", cascade = CascadeType.ALL)
-    private List<SkillRequest> skills;
+    private List<SkillRequest> skillRequests = new ArrayList<>();
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -77,6 +77,13 @@ public class RecommendationRequest {
     private LocalDateTime updatedAt;
 
     public void addSkillRequest(SkillRequest skillRequest) {
-        skills.add(skillRequest);
+        skillRequests.add(skillRequest);
+    }
+
+    public void createSkillRequest(Skill skill) {
+        SkillRequest skillRequest = new SkillRequest();
+        skillRequest.setRequest(this);
+        skillRequest.setSkill(skill);
+        addSkillRequest(skillRequest);
     }
 }

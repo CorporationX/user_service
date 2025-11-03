@@ -5,11 +5,14 @@ import school.faang.user_service.entity.user.Country;
 import school.faang.user_service.exception.EntityNotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface CountryRepository extends JpaRepository<Country, Long> {
 
     List<Country> findByTitleIn(Set<String> titles);
+
+    Optional<Country> findByTitle(String title);
 
     default Country getByIdOrThrow(long countryId) {
         return findById(countryId)

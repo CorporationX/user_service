@@ -47,7 +47,7 @@ dependencies {
     /**
      * Utils & Logging
      */
-
+    implementation("org.imgscalr", "imgscalr-lib", "4.2")
     implementation("org.springdoc", "springdoc-openapi-starter-webmvc-ui", "2.6.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")

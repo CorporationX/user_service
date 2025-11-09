@@ -103,12 +103,15 @@ public class User {
     private List<Event> ownedEvents;
 
     @ManyToMany(mappedBy = "mentors", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<User> mentees = new ArrayList<>();
 
     @ManyToMany
+
     @JoinTable(name = "mentorship",
             joinColumns = @JoinColumn(name = "mentee_id"),
             inverseJoinColumns = @JoinColumn(name = "mentor_id"))
+    @Builder.Default
     private List<User> mentors = new ArrayList<>();
 
     @OneToMany(mappedBy = "receiver")

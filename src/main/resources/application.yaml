@@ -21,6 +21,11 @@ spring:
       port: 6379
       host: localhost
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 server:
   port: 8080
 
@@ -44,3 +49,16 @@ user:
 goal:
   active:
     amount: 2
+
+aws:
+  region: ${AWS_REGION:eu-north-1}
+  credentials:
+    access-key: ${AWS_ACCESS_KEY_ID:dummy-access-key}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:dummy-secret-key}
+  s3:
+    bucket: ${AWS_S3_BUCKET:hydra12}
+
+avatar:
+  dicebear:
+    base-url: "https://api.dicebear.com/9.x/open-peeps/png"
+    default-size: 256

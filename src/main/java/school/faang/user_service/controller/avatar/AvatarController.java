@@ -12,14 +12,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.picture.PictureDto;
 import school.faang.user_service.dto.picture.PictureType;
 import school.faang.user_service.entity.user.UserProfilePic;
-import school.faang.user_service.service.S3.S3service;
 import school.faang.user_service.service.avatar.AvatarService;
+import school.faang.user_service.service.s3.S3service;
 
 import java.util.List;
 
@@ -41,7 +46,7 @@ public class AvatarController {
     @ApiResponse(responseCode = "201", description = "Аватар успешно загружен",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                     schema = @Schema(implementation = PictureDto.class)))
-    @ApiResponse(responseCode = "400", description = "Ошибка валидации (файл слишком большой, неверный тип)", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации", content = @Content)
     @Parameter(name = "x-user-id", required = true, in = ParameterIn.HEADER)
     public ResponseEntity<List<PictureDto>> uploadAvatar(@RequestParam("file") MultipartFile file) {
         long userId = userContext.getUserId();
@@ -60,8 +65,11 @@ public class AvatarController {
     }
 
     @GetMapping("/download")
-    @Operation(summary = "Скачивание аватара пользователя", description = "Возвращает файл аватара в виде массива байт.")
-    @ApiResponse(responseCode = "200", description = "Файл аватара", content = @Content(mediaType = MediaType.IMAGE_PNG_VALUE))
+    @Operation(summary = "Скачивание аватара пользователя",
+            description = "Возвращает файл аватара в виде массива байт.")
+    @ApiResponse(responseCode = "200",
+            description = "Файл аватара",
+            content = @Content(mediaType = MediaType.IMAGE_PNG_VALUE))
     @ApiResponse(responseCode = "404", description = "Аватар не найден", content = @Content)
     @Parameter(name = "x-user-id", required = true, in = ParameterIn.HEADER)
     public ResponseEntity<byte[]> downloadAvatar() {
@@ -75,7 +83,8 @@ public class AvatarController {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "Удаление аватара пользователя", description = "Удаляет текущий аватар и устанавливает аватар по умолчанию.")
+    @Operation(summary = "Удаление аватара пользователя",
+            description = "Удаляет текущий аватар и устанавливает аватар по умолчанию.")
     @ApiResponse(responseCode = "200", description = "URL нового аватара по умолчанию",
             content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE,
                     schema = @Schema(implementation = String.class)))

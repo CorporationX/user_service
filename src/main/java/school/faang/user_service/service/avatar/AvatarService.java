@@ -18,8 +18,8 @@ public interface AvatarService {
      * @param userId ID пользователя, для которого загружается аватар.
      * @param file   Объект MultipartFile, представляющий загружаемый файл изображения.
      * @return Объект {@link UserProfilePic}, содержащий ключи (fileId) для большой и маленькой версий аватара в S3.
-     * @throws DataValidationException если файл не прошел валидацию (например, слишком большой, не является изображением, поврежден).
-     * @throws RuntimeException если произошла ошибка при загрузке файла в S3 или при его обработке.
+     * @throws DataValidationException если файл не прошел валидацию (слишком большой, не является изображением)
+     * @throws RuntimeException        если произошла ошибка при загрузке файла в S3 или при его обработке.
      */
     UserProfilePic uploadAvatar(long userId, MultipartFile file);
 
@@ -32,7 +32,7 @@ public interface AvatarService {
      * @param userId ID пользователя, чей аватар необходимо скачать.
      * @return Массив байт {@code byte[]}, представляющий изображение аватара в формате PNG.
      * @throws school.faang.user_service.exception.EntityNotFoundException если аватар для пользователя не найден.
-     * @throws DataValidationException если у пользователя установлен аватар по умолчанию (внешний URL), который нельзя скачать.
+     * @throws DataValidationException если у пользователя установлен аватар по умолчанию, который нельзя скачать.
      * @throws RuntimeException если произошла ошибка при скачивании файла из S3.
      */
     byte[] downloadAvatar(long userId);

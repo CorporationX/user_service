@@ -17,14 +17,24 @@ import school.faang.user_service.entity.user.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.user.UserRepository;
-import school.faang.user_service.service.S3.S3service;
+import school.faang.user_service.service.s3.S3service;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AvatarServiceImplTest {
@@ -57,12 +67,12 @@ class AvatarServiceImplTest {
 
         @Test
         @DisplayName("Upload success when user has no previous avatar")
-        void testUploadAvatar_NewUser_Success() throws Exception {
+        void testUploadAvatarNewUserSuccess() throws Exception {
             // Arrange
             MultipartFile file = new MockMultipartFile("file", "test.png", "image/png", new byte[1024]);
             BufferedImage mockImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
 
-            when(userRepository.getByIdOrThrow(userId)).thenReturn(user); // user.getUserProfilePic() is null
+            when(userRepository.getByIdOrThrow(userId)).thenReturn(user);
             when(s3service.uploadFileToS3(any(), anyString())).thenReturn("new-file-id");
 
             try (MockedStatic<ImageIO> mockedImageIO = mockStatic(ImageIO.class)) {
@@ -76,13 +86,13 @@ class AvatarServiceImplTest {
                 assertEquals("new-file-id", result.getFileId());
                 verify(userRepository, times(1)).save(user);
                 verify(s3service, times(2)).uploadFileToS3(any(), anyString());
-                verify(s3service, never()).deleteFileFromS3(anyString()); // Verify old files are NOT deleted
+                verify(s3service, never()).deleteFileFromS3(anyString());
             }
         }
 
         @Test
         @DisplayName("Upload success and delete old avatar when user has a previous custom avatar")
-        void testUploadAvatar_WithPreviousAvatar_DeletesOldFiles() throws Exception {
+        void testUploadAvatarWithPreviousAvatarDeletesOldFiles() throws Exception {
             // Arrange
             UserProfilePic oldPic = new UserProfilePic();
             oldPic.setFileId("old_big_key");
@@ -111,7 +121,7 @@ class AvatarServiceImplTest {
 
         @Test
         @DisplayName("Upload success when user has a default avatar (http link)")
-        void testUploadAvatar_WithDefaultAvatar_DeletesNothing() throws Exception {
+        void testUploadAvatarWithDefaultAvatarDeletesNothing() throws Exception {
             // Arrange
             UserProfilePic oldPic = new UserProfilePic();
             oldPic.setFileId("http://dicebear.com/api/...");
@@ -130,14 +140,14 @@ class AvatarServiceImplTest {
                 avatarService.uploadAvatar(userId, file);
 
                 // Assert
-                verify(s3service, never()).deleteFileFromS3(anyString()); // Default avatar should not be deleted
+                verify(s3service, never()).deleteFileFromS3(anyString());
                 verify(s3service, times(2)).uploadFileToS3(any(), anyString());
             }
         }
 
         @Test
         @DisplayName("Should throw exception when file is too large")
-        void testUploadAvatar_FileTooLarge_ThrowsException() {
+        void testUploadAvatarFileTooLargeThrowsException() {
             MultipartFile file = new MockMultipartFile("file", "test.png", "image/png", new byte[6 * 1024 * 1024]);
             when(userRepository.getByIdOrThrow(userId)).thenReturn(user);
             assertThrows(DataValidationException.class, () -> avatarService.uploadAvatar(userId, file));
@@ -145,7 +155,7 @@ class AvatarServiceImplTest {
 
         @Test
         @DisplayName("Should throw exception for invalid content type")
-        void testUploadAvatar_InvalidContentType_ThrowsException() {
+        void testUploadAvatarInvalidContentTypeThrowsException() {
             MultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", new byte[1024]);
             when(userRepository.getByIdOrThrow(userId)).thenReturn(user);
             assertThrows(DataValidationException.class, () -> avatarService.uploadAvatar(userId, file));
@@ -158,7 +168,7 @@ class AvatarServiceImplTest {
 
         @Test
         @DisplayName("Delete success when user has a custom avatar")
-        void testDeleteAvatar_WithCustomAvatar_Success() {
+        void testDeleteAvatarWithCustomAvatarSuccess() {
             // Arrange
             UserProfilePic pic = new UserProfilePic();
             pic.setFileId("avatars/1/some-id.png");
@@ -168,7 +178,7 @@ class AvatarServiceImplTest {
             when(userRepository.getByIdOrThrow(userId)).thenReturn(user);
 
             // Act
-            String resultUrl = avatarService.deleteAvatar(userId);
+            final String resultUrl = avatarService.deleteAvatar(userId);
 
             // Assert
             verify(s3service, times(1)).deleteFileFromS3("avatars/1/some-id.png");
@@ -180,7 +190,7 @@ class AvatarServiceImplTest {
 
         @Test
         @DisplayName("Delete success when user has a default avatar")
-        void testDeleteAvatar_WithDefaultAvatar_DeletesNothing() {
+        void testDeleteAvatarWithDefaultAvatarDeletesNothing() {
             // Arrange
             UserProfilePic pic = new UserProfilePic();
             pic.setFileId("http://test.com/avatar.png");
@@ -192,8 +202,8 @@ class AvatarServiceImplTest {
             avatarService.deleteAvatar(userId);
 
             // Assert
-            verify(s3service, never()).deleteFileFromS3(anyString()); // Nothing to delete
-            verify(userRepository, times(1)).save(user); // Still saves the new default URL
+            verify(s3service, never()).deleteFileFromS3(anyString());
+            verify(userRepository, times(1)).save(user);
         }
     }
 
@@ -203,7 +213,7 @@ class AvatarServiceImplTest {
 
         @Test
         @DisplayName("Download success for a custom avatar")
-        void testDownloadAvatar_Success() {
+        void testDownloadAvatarSuccess() {
             // Arrange
             UserProfilePic pic = new UserProfilePic();
             pic.setFileId("avatars/1/some-id.png");
@@ -222,7 +232,7 @@ class AvatarServiceImplTest {
 
         @Test
         @DisplayName("Should throw exception when avatar does not exist")
-        void testDownloadAvatar_WhenAvatarNotExists() {
+        void testDownloadAvatarWhenAvatarNotExists() {
             user.setUserProfilePic(null);
             when(userRepository.getByIdOrThrow(userId)).thenReturn(user);
             assertThrows(EntityNotFoundException.class, () -> avatarService.downloadAvatar(userId));
@@ -230,7 +240,7 @@ class AvatarServiceImplTest {
 
         @Test
         @DisplayName("Should throw exception when trying to download a default avatar")
-        void testDownloadAvatar_WhenDefaultAvatarIsSet() {
+        void testDownloadAvatarWhenDefaultAvatarIsSet() {
             UserProfilePic pic = new UserProfilePic();
             pic.setFileId("http://test.com/avatar.png");
             user.setUserProfilePic(pic);

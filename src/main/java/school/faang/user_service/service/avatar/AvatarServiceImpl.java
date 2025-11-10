@@ -1,7 +1,7 @@
 package school.faang.user_service.service.avatar;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j; // Импорт для логирования
+import lombok.extern.slf4j.Slf4j;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import school.faang.user_service.entity.user.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.user.UserRepository;
-import school.faang.user_service.service.S3.S3service;
+import school.faang.user_service.service.s3.S3service;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -45,7 +45,8 @@ public class AvatarServiceImpl implements AvatarService {
         deleteOldAvatarFiles(user);
 
         if (file.isEmpty() || file.getSize() > MAX_AVATAR_SIZE) {
-            throw new DataValidationException("File size exceeds the maximum limit of " + MAX_AVATAR_SIZE / 1024L / 1024L + " MB.");
+            throw new DataValidationException("File size exceeds the maximum limit of "
+                    + MAX_AVATAR_SIZE / 1024L / 1024L + " MB.");
         }
 
         String contentType = file.getContentType();
@@ -124,10 +125,7 @@ public class AvatarServiceImpl implements AvatarService {
         deleteOldAvatarFiles(user);
 
         String defaultAvatarUrl = String.format("%s?seed=%s&size=%d",
-                dicebearBaseUrl,
-                user.getUsername(),
-                dicebearDefaultSize
-        );
+                dicebearBaseUrl, user.getUsername(), dicebearDefaultSize);
         log.info("Generated new default avatar URL for user ID: {}", userId);
 
         UserProfilePic userProfilePic = user.getUserProfilePic();
@@ -146,8 +144,8 @@ public class AvatarServiceImpl implements AvatarService {
     }
 
     private BufferedImage resizeImage(BufferedImage originalImage, int targetSize) {
-        Scalr.Mode mode = originalImage.getWidth() > originalImage.getHeight() ?
-                Scalr.Mode.FIT_TO_WIDTH : Scalr.Mode.FIT_TO_HEIGHT;
+        Scalr.Mode mode = originalImage.getWidth() > originalImage.getHeight()
+                ? Scalr.Mode.FIT_TO_WIDTH : Scalr.Mode.FIT_TO_HEIGHT;
         return Scalr.resize(originalImage, Scalr.Method.QUALITY, mode, targetSize);
     }
 
@@ -159,6 +157,7 @@ public class AvatarServiceImpl implements AvatarService {
 
     /**
      * Приватный метод для удаления старых файлов аватара из S3, если они существуют и не являются дефолтными.
+     *
      * @param user пользователь, чей аватар нужно проверить и удалить.
      */
     private void deleteOldAvatarFiles(User user) {

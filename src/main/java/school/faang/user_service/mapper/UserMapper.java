@@ -12,7 +12,7 @@ import school.faang.user_service.dto.user.UpdateUserDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.entity.user.UserProfilePic;
-import school.faang.user_service.service.S3.S3service;
+import school.faang.user_service.service.s3.S3service;
 
 import java.util.ArrayList;
 import java.util.List;

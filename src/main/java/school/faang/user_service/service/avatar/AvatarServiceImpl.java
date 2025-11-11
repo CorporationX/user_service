@@ -117,7 +117,7 @@ public class AvatarServiceImpl implements AvatarService {
 
         String fileKey = userProfilePic.getFileId();
 
-        if (fileKey.startsWith(dicebearBaseUrl)) {
+        if (fileKey.startsWith("http")) {
             throw new DataValidationException("Cannot download the default avatar. Please use the provided URL.");
         }
 
@@ -177,7 +177,7 @@ public class AvatarServiceImpl implements AvatarService {
             backoff = @Backoff(delay = 1000, multiplier = 2))
     private void deleteOldAvatarFiles(User user) {
         UserProfilePic oldPic = user.getUserProfilePic();
-        if (oldPic != null && oldPic.getFileId() != null && !oldPic.getFileId().startsWith(dicebearBaseUrl)) {
+        if (oldPic != null && oldPic.getFileId() != null && !oldPic.getFileId().startsWith("http")) {
             log.info("Deleting old avatar for user ID: {}. File keys: {}, {}",
                     user.getId(), oldPic.getFileId(), oldPic.getSmallFileId());
             try {

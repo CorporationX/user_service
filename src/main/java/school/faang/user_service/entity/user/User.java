@@ -107,7 +107,6 @@ public class User {
     private List<User> mentees = new ArrayList<>();
 
     @ManyToMany
-
     @JoinTable(name = "mentorship",
             joinColumns = @JoinColumn(name = "mentee_id"),
             inverseJoinColumns = @JoinColumn(name = "mentor_id"))

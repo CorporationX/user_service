@@ -3,6 +3,7 @@ package school.faang.user_service.service.education;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.user.education.CreateEducationDto;
 import school.faang.user_service.dto.user.education.EducationDto;
 import school.faang.user_service.entity.user.Education;
 import school.faang.user_service.entity.user.User;
@@ -27,7 +28,7 @@ public class EducationServiceImpl implements EducationService {
 
 
     @Override
-    public EducationDto addEducation(long userId, EducationDto educationDto) {
+    public EducationDto addEducation(long userId, CreateEducationDto educationDto ) {
         int currentYear = Year.now().getValue();
 
         if (educationDto.yearFrom() > currentYear) {

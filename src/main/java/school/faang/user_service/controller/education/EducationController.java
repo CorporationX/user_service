@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.user.education.CreateEducationDto;
 import school.faang.user_service.dto.user.education.EducationDto;
 
 import school.faang.user_service.service.education.EducationService;
@@ -16,7 +17,7 @@ public class EducationController {
     private final UserContext userContext;
 
     @PostMapping
-    public EducationDto addEducation(@Valid @RequestBody EducationDto educationDto) {
+    public EducationDto addEducation(@Valid @RequestBody CreateEducationDto educationDto) {
 
         long userId = userContext.getUserId();
         return educationService.addEducation(userId, educationDto);

@@ -25,7 +25,7 @@ public class EducationController {
 
     @PutMapping("/{educationId}")
     public EducationDto updateEducation(@PathVariable long educationId,
-                                        @RequestBody EducationDto educationDto) {
+                                        @RequestBody CreateEducationDto educationDto) {
 
 
         long userId = userContext.getUserId();

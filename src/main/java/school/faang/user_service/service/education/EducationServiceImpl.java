@@ -44,7 +44,7 @@ public class EducationServiceImpl implements EducationService {
     }
 
     @Override
-    public EducationDto updateEducation(long userId, long educationId, EducationDto educationDto) {
+    public EducationDto updateEducation(long userId, long educationId, CreateEducationDto educationDto) {
         int currentYear = Year.now().getValue();
         if (educationDto.yearFrom() != null && educationDto.yearFrom() > currentYear) {
             throw new DataValidationException("YearFrom cannot be greater than the current year");
@@ -78,7 +78,7 @@ public class EducationServiceImpl implements EducationService {
         return educationMapper.toEducationDto(education);
     }
 
-    public void validateEducationDto(EducationDto educationDto) {
+    public void validateEducationDto(CreateEducationDto educationDto) {
         if (educationDto.educationLevel() == null || educationDto.institution().isBlank()) {
             throw new DataValidationException("Institution cannot be null or empty");
         }

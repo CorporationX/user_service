@@ -35,13 +35,16 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Build with Gradle
-        run: ./gradlew build testClasses -x test -x check -x checkstyleMain -x checkstyleTest --no-daemon
+        run: ./gradlew build testClasses -x test -x checkstyleMain -x checkstyleTest --no-daemon
 
       - name: Checkstyle verification
         run: ./gradlew checkstyleMain checkstyleTest --no-daemon --continue
 
       - name: Test with Gradle
         run: ./gradlew test -x testClasses --no-daemon --continue
+
+      - name: Generate Jacoco Report
+        run: ./gradlew jacocoTestCoverageVerification --no-daemon --continue
 
       - name: Archive test report
         if: always()
@@ -56,6 +59,13 @@ jobs:
         with:
           name: checkstyle_report
           path: build/reports/checkstyle
+
+      - name: Archive jacoco report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco_report
+          path: build/jacocoHtml
 
       - name: Comment on Pull Request if build failed
         if: failure()

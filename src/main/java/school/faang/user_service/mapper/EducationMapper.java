@@ -1,8 +1,6 @@
 package school.faang.user_service.mapper;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import school.faang.user_service.dto.user.education.CreateEducationDto;
 import school.faang.user_service.dto.user.education.EducationDto;
 import school.faang.user_service.dto.user.education.UpdateEducationDto;

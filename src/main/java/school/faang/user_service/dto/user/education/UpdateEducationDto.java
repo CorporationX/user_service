@@ -1,15 +1,9 @@
 package school.faang.user_service.dto.user.education;
+public record UpdateEducationDto (
+    Integer yearFrom,
+    Integer yearTo,
+    String institution,
+    String educationLevel,
+    String specialization)
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
-@Getter
-public class UpdateEducationDto {
-    private final Integer yearFrom;
-    private final Integer yearTo;
-    private final String institution;
-    private final String educationLevel;
-    private final String specialization;
-
-}
+{}

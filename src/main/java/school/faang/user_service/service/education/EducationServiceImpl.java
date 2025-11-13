@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.education.CreateEducationDto;
 import school.faang.user_service.dto.user.education.EducationDto;
+import school.faang.user_service.dto.user.education.UpdateEducationDto;
 import school.faang.user_service.entity.user.Education;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
@@ -29,6 +30,7 @@ public class EducationServiceImpl implements EducationService {
 
     @Override
     public EducationDto addEducation(long userId, CreateEducationDto educationDto ) {
+        log.info("Adding education for userId={} with institution={}", userId, educationDto);
         int currentYear = Year.now().getValue();
 
         if (educationDto.yearFrom() > currentYear) {
@@ -44,13 +46,13 @@ public class EducationServiceImpl implements EducationService {
     }
 
     @Override
-    public EducationDto updateEducation(long userId, long educationId, CreateEducationDto educationDto) {
+    public EducationDto updateEducation(long userId, long educationId, UpdateEducationDto educationDto) {
         int currentYear = Year.now().getValue();
         if (educationDto.yearFrom() != null && educationDto.yearFrom() > currentYear) {
             throw new DataValidationException("YearFrom cannot be greater than the current year");
         }
 
-        validateEducationDto(educationDto);
+        //validateEducationDto(educationDto);
 
         Education education = educationRepository.findById(educationId)
                 .orElseThrow(() -> new EntityNotFoundException("Education not found with id " + educationId));

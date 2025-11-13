@@ -7,6 +7,7 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.education.CreateEducationDto;
 import school.faang.user_service.dto.user.education.EducationDto;
 
+import school.faang.user_service.dto.user.education.UpdateEducationDto;
 import school.faang.user_service.service.education.EducationService;
 
 @RestController
@@ -25,7 +26,7 @@ public class EducationController {
 
     @PutMapping("/{educationId}")
     public EducationDto updateEducation(@PathVariable long educationId,
-                                        @RequestBody CreateEducationDto educationDto) {
+                                        @RequestBody UpdateEducationDto educationDto) {
 
 
         long userId = userContext.getUserId();

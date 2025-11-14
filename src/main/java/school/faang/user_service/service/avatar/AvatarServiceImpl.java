@@ -1,12 +1,8 @@
 package school.faang.user_service.service.avatar;
 
-import com.amazonaws.AmazonClientException;
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.EnableRetry;
@@ -21,27 +17,18 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.user.UserRepository;
 import school.faang.user_service.service.s3.S3service;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.UUID;
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
 @EnableRetry
 public class AvatarServiceImpl implements AvatarService {
     private static final long MAX_AVATAR_SIZE = 5 * 1024 * 1024;
-    private static final int BIG_AVATAR_SIZE = 1080;
-    private static final int SMALL_AVATAR_SIZE = 170;
 
     private final UserRepository userRepository;
     private final S3service s3service;
 
     @Value("${avatar.dicebear.base-url}")
     private String dicebearBaseUrl;
-
     @Value("${avatar.dicebear.default-size}")
     private int dicebearDefaultSize;
 
@@ -56,52 +43,25 @@ public class AvatarServiceImpl implements AvatarService {
             throw new DataValidationException("File size exceeds the maximum limit of "
                     + MAX_AVATAR_SIZE / 1024L / 1024L + " MB.");
         }
-
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
             throw new DataValidationException("Invalid file type. Only images are allowed.");
         }
 
-        try {
-            BufferedImage originalImage = ImageIO.read(file.getInputStream());
-            if (originalImage == null) {
-                throw new DataValidationException("The provided file is corrupted or not a valid image.");
-            }
+        UserProfilePic newProfilePic = s3service.uploadAvatar(userId, file);
 
-            log.debug("Resizing images for user ID: {}", userId);
-            BufferedImage resizedBig = resizeImage(originalImage, BIG_AVATAR_SIZE);
-            BufferedImage resizedSmall = resizeImage(originalImage, SMALL_AVATAR_SIZE);
-
-            byte[] bigImageBytes = imageToPngBytes(resizedBig);
-            byte[] smallImageBytes = imageToPngBytes(resizedSmall);
-
-            String bigFileKey = "avatars/" + userId + "/" + UUID.randomUUID() + ".png";
-            String smallFileKey = "avatars/" + userId + "/" + UUID.randomUUID() + ".png";
-
-            log.info("Uploading resized images to S3 for user ID: {}. Keys: {}, {}", userId, bigFileKey, smallFileKey);
-            String fileId = s3service.uploadFileToS3(bigImageBytes, bigFileKey);
-            String smallFileId = s3service.uploadFileToS3(smallImageBytes, smallFileKey);
-
-            UserProfilePic userProfilePic = user.getUserProfilePic();
-            if (userProfilePic == null) {
-                userProfilePic = new UserProfilePic();
-                log.debug("Creating new UserProfilePic entity for user ID: {}", userId);
-            }
-            userProfilePic.setFileId(fileId);
-            userProfilePic.setSmallFileId(smallFileId);
-            user.setUserProfilePic(userProfilePic);
-            userRepository.save(user);
-            log.info("Successfully saved avatar details for user ID: {}", userId);
-
-            return userProfilePic;
-
-        } catch (IOException e) {
-            log.error("Error processing avatar file for user ID: {}", userId, e);
-            throw new RuntimeException("Error processing avatar file.", e);
-        } catch (Exception e) {
-            log.error("Error uploading avatar to S3 for user ID: {}", userId, e);
-            throw new RuntimeException("Error uploading avatar to S3.", e);
+        UserProfilePic userProfilePic = user.getUserProfilePic();
+        if (userProfilePic == null) {
+            userProfilePic = new UserProfilePic();
+            log.debug("Creating new UserProfilePic entity for user ID: {}", userId);
         }
+        userProfilePic.setFileId(newProfilePic.getFileId());
+        userProfilePic.setSmallFileId(newProfilePic.getSmallFileId());
+        user.setUserProfilePic(userProfilePic);
+        userRepository.save(user);
+        log.info("Successfully saved avatar details for user ID: {}", userId);
+
+        return userProfilePic;
     }
 
     @Override
@@ -114,9 +74,7 @@ public class AvatarServiceImpl implements AvatarService {
         if (userProfilePic == null || userProfilePic.getFileId() == null) {
             throw new EntityNotFoundException("Avatar not found for user ID: " + userId);
         }
-
         String fileKey = userProfilePic.getFileId();
-
         if (fileKey.startsWith("http")) {
             throw new DataValidationException("Cannot download the default avatar. Please use the provided URL.");
         }
@@ -132,8 +90,12 @@ public class AvatarServiceImpl implements AvatarService {
         User user = userRepository.getByIdOrThrow(userId);
         deleteOldAvatarFiles(user);
 
-        String defaultAvatarUrl = String.format("%s?seed=%s&size=%d",
-                dicebearBaseUrl, user.getUsername(), dicebearDefaultSize);
+        String defaultAvatarUrl = String.format(
+                "%s?seed=%s&size=%d",
+                dicebearBaseUrl,
+                user.getUsername(),
+                dicebearDefaultSize
+        );
         log.info("Generated new default avatar URL for user ID: {}", userId);
 
         UserProfilePic userProfilePic = user.getUserProfilePic();
@@ -142,50 +104,22 @@ public class AvatarServiceImpl implements AvatarService {
             log.debug("Creating new UserProfilePic entity for user ID: {} to set default avatar", userId);
         }
         userProfilePic.setFileId(defaultAvatarUrl);
-        userProfilePic.setSmallFileId(defaultAvatarUrl); // Важно: для маленькой тоже
+        userProfilePic.setSmallFileId(defaultAvatarUrl);
         user.setUserProfilePic(userProfilePic);
 
         userRepository.save(user);
         log.info("Successfully set default avatar for user ID: {}", userId);
-
         return defaultAvatarUrl;
     }
 
-    private BufferedImage resizeImage(BufferedImage originalImage, int targetSize) {
-        Scalr.Mode mode = originalImage.getWidth() > originalImage.getHeight()
-                ? Scalr.Mode.FIT_TO_WIDTH : Scalr.Mode.FIT_TO_HEIGHT;
-        return Scalr.resize(originalImage, Scalr.Method.QUALITY, mode, targetSize);
-    }
-
-    private byte[] imageToPngBytes(BufferedImage image) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(image, "png", baos);
-        return baos.toByteArray();
-    }
-
-    /**
-     * Приватный метод для удаления старых файлов аватара из S3, если они существуют и не являются дефолтными.
-     *
-     * @param user пользователь, чей аватар нужно проверить и удалить.
-     */
-    @Retryable(retryFor = {
-            AmazonS3Exception.class,
-            AmazonServiceException.class,
-            AmazonClientException.class,
-            SdkClientException.class},
-            maxAttempts = 3,
-            backoff = @Backoff(delay = 1000, multiplier = 2))
+    @Retryable(retryFor = {SdkClientException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2))
     private void deleteOldAvatarFiles(User user) {
         UserProfilePic oldPic = user.getUserProfilePic();
         if (oldPic != null && oldPic.getFileId() != null && !oldPic.getFileId().startsWith("http")) {
             log.info("Deleting old avatar for user ID: {}. File keys: {}, {}",
                     user.getId(), oldPic.getFileId(), oldPic.getSmallFileId());
-            try {
-                s3service.deleteFileFromS3(oldPic.getFileId());
-                s3service.deleteFileFromS3(oldPic.getSmallFileId());
-            } catch (Exception e) {
-                log.error("Could not delete old avatar from S3 for user {}. Error: {}", user.getId(), e.getMessage());
-            }
+            s3service.deleteFileFromS3(oldPic.getFileId());
+            s3service.deleteFileFromS3(oldPic.getSmallFileId());
         }
     }
 }

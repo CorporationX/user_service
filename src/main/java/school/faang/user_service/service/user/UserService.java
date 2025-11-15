@@ -1,9 +1,10 @@
 package school.faang.user_service.service.user;
 
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.dto.user.UpdateUserDto;
 import school.faang.user_service.dto.user.UserDto;
-
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -78,7 +79,24 @@ public interface UserService {
      * @param ids список id пользователей
      * @return список объектов {@link UserDto}, представляющих пользователей.
      */
+
     List<UserDto> getUsersByIds(List<Long> ids);
+    /**
+     * Добавляет в базу данных новых студентов, данные о которых поступают из внешнего CSV-файла.
+     * <p>
+     * Каждый студент, указанный в файле, преобразуется в объект {@link UserDto} и сохраняется в базе данных.
+     * В случае, если некоторые записи в файле содержат некорректные данные, такие записи пропускаются,
+     * а корректные пользователи продолжают добавляться.
+     * <p>
+     * Формат CSV-файла должен соответствовать ожидаемой структуре
+     * (например, содержать поля: имя, фамилия, email и т.д.).
+     *
+     * @param file CSV-файл, содержащий список новых студентов для добавления.
+     * @return список объектов {@link UserDto}, представляющих успешно добавленных студентов.
+     * @throws IOException если произошла ошибка при чтении файла.
+     */
+
+    List<UserDto> addStudents(MultipartFile file) throws IOException;
 }
 
 

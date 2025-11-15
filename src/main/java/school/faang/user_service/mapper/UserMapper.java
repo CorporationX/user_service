@@ -5,6 +5,7 @@ import org.mapstruct.MappingTarget;
 import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.dto.user.UpdateUserDto;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.entity.person.Person;
 import school.faang.user_service.entity.user.User;
 
 import java.util.List;
@@ -19,4 +20,6 @@ public interface UserMapper {
     UserDto toUserDto(User user);
 
     List<UserDto> toUserDtoList(List<User> users);
+
+    User personToUser(Person person);
 }

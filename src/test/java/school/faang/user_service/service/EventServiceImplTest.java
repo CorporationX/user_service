@@ -134,4 +134,6 @@ class EventServiceImplTest {
 
         verify(eventRepository).deleteById(eventId);
     }
+
+
 }

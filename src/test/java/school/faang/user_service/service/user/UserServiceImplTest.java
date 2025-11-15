@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.CreateUserDto;
@@ -19,9 +20,11 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.user.CountryRepository;
 import school.faang.user_service.repository.user.UserRepository;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
@@ -226,6 +229,38 @@ public class UserServiceImplTest {
         assertEquals(0, result.size());
         verify(userRepository).findAllById(ids);
         verify(userMapper).toUserDtoList(emptyList);
+    }
+
+    @SuppressWarnings("checkstyle:LineLength")
+    @Test
+    void addStudents_parsesCsvAndReturnsUserDtos() throws IOException {
+        String csv = """
+                firstName,lastName,yearOfBirth,group,studentID,email,phone,street,city,state,country,postalCode,faculty,yearOfStudy,major,GPA,status,admissionDate,graduationDate,degree,institution,completionYear,scholarship,employer
+                John,Doe,1998,A,123456,johndoe@example.com,+1-123-456-7890,123 Main Street,New York,NY,USA,10001,Computer Science,3,Software Engineering,3.8,Active,2016-09-01,2020-05-30,High School Diploma,XYZ High School,2016,true,XYZ Technologies
+                Jane,Smith,1997,B,654321,janesmith@example.com,+1-987-654-3210,456 Second St,Boston,MA,USA,12345,Math,4,Statistics,3.9,Active,2015-09-01,2019-05-30,Bachelor,ABC University,2015,true,ABC Corp
+                """;
+
+        MockMultipartFile file = new MockMultipartFile(
+                "students.csv",                 // имя файла (может быть любое)
+                "students.csv",                 // оригинальное имя файла
+                "text/csv",                     // content type
+                csv.getBytes()                  // данные файла
+        );
+
+        List<UserDto> userDtos = userService.addStudents(file);
+
+        assertNotNull(userDtos);
+        assertEquals(2, userDtos.size());
+
+        UserDto first = userDtos.get(0);
+        assertEquals("John Doe", first.username());
+        assertEquals("johndoe@example.com", first.email());
+        assertEquals("+1-123-456-7890", first.phone());
+
+        UserDto second = userDtos.get(1);
+        assertEquals("Jane Smith", second.username());
+        assertEquals("janesmith@example.com", second.email());
+        assertEquals("+1-987-654-3210", second.phone());
     }
 
     private UserDto createUserDto(long id) {

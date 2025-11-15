@@ -19,9 +19,6 @@ import school.faang.user_service.dto.user.UpdateUserDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.user.UserService;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 

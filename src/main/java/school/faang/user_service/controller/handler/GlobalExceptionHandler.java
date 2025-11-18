@@ -11,6 +11,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.ForbiddenException;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -25,21 +26,11 @@ public class GlobalExceptionHandler {
         String errors = e.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map((fieldError) -> fieldError.getField() + " - " + fieldError.getDefaultMessage())
+                .map(fieldError -> String.format("%s - %s", fieldError.getField(), fieldError.getDefaultMessage()))
                 .collect(Collectors.joining("; "));
 
         log.warn("Method argument not valid exception at {}, {}: {}",
                 safeMethod(req), safeUri(req), errors);
-
-        return ErrorResponseFactory.create(e, req, HttpStatus.BAD_REQUEST);
-    }
-
-    // Ошибка валидации данных
-    @ExceptionHandler(DataValidationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleDataValidationException(DataValidationException e, HttpServletRequest req) {
-        log.warn("Data validation exception at {}, {}: {}",
-                safeMethod(req), safeUri(req), e.getMessage());
 
         return ErrorResponseFactory.create(e, req, HttpStatus.BAD_REQUEST);
     }
@@ -66,6 +57,7 @@ public class GlobalExceptionHandler {
 
     // Плохие запросы клиентов
     @ExceptionHandler({
+            DataValidationException.class,
             IllegalArgumentException.class,
             IllegalStateException.class
     })
@@ -88,10 +80,10 @@ public class GlobalExceptionHandler {
     }
 
     private String safeMethod(HttpServletRequest req) {
-        return req != null ? req.getMethod() : "N/A";
+        return Optional.ofNullable(req).map(HttpServletRequest::getMethod).orElse("N/A");
     }
 
     private String safeUri(HttpServletRequest req) {
-        return req != null ? req.getRequestURI() : "N/A";
+        return Optional.ofNullable(req).map(HttpServletRequest::getRequestURI).orElse("N/A");
     }
 }

@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -71,9 +72,9 @@ public class UserController {
     }
 
     @PostMapping("/addStudents")
-    public List<UserDto> addStudents(@RequestParam("file") MultipartFile file) throws IOException {
-
-        return null;
+    public ResponseEntity<List<UserDto>> addStudents(@RequestParam("file") MultipartFile file) throws IOException {
+        List<UserDto> students = userService.addStudents(file);
+        return ResponseEntity.ok(students);
     }
 
     private void validateString(String value, String paramName) {

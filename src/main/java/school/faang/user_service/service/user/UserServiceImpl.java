@@ -1,6 +1,5 @@
 package school.faang.user_service.service.user;
 
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,10 +22,10 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.user.CountryRepository;
 import school.faang.user_service.repository.user.UserRepository;
 import school.faang.user_service.utils.PasswordUtils;
-
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +40,6 @@ public class UserServiceImpl implements UserService {
     private final CountryRepository countryRepository;
     private final UserMapper userMapper;
     private final UserContext userContext;
-    private final CsvMapper mapper;
 
     @Override
     public UserDto create(CreateUserDto userDto) {
@@ -93,9 +91,11 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> addStudents(MultipartFile file) throws IOException {
         List<UserDto> userDtos = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(file.getOriginalFilename()))) {
+        InputStreamReader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
+
+        try (BufferedReader br = new BufferedReader(reader)) {
             String line;
-            br.readLine(); // пропуск заголовка
+            br.readLine();
 
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
@@ -141,15 +141,11 @@ public class UserServiceImpl implements UserService {
                 person.setScholarship(Boolean.parseBoolean(values[22].trim()));
                 person.setEmployer(values[23].trim());
 
-                // ======== ДОБАВЛЕНА ЛОГИКА ПО ЗАДАНИЮ ========
-                // 1) Маппинг Person→User через MapStruct
                 User user = userMapper.personToUser(person);
 
-                // 2) Автоматическая генерация пароля
                 String password = PasswordUtils.generatePassword(minPasswordLength);
                 user.setPassword(password);
 
-                // 3) Поиск/создание страны
                 String countryName = person.getContactInfo().getAddress().getCountry();
                 Country country = countryRepository.findByTitle(countryName)
                         .orElseGet(() -> {
@@ -159,12 +155,11 @@ public class UserServiceImpl implements UserService {
                         });
                 user.setCountry(country);
 
-                // 4) Сохраняем User в БД
                 userRepository.save(user);
 
-                // 5) Маппинг User→UserDto для выдачи наружу (например, MapStruct)
-                UserDto userDto = userMapper.toUserDto(user);
+                UserDto userDto = convertToUserDto(person);
                 userDtos.add(userDto);
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -174,15 +169,13 @@ public class UserServiceImpl implements UserService {
         return userDtos;
     }
 
-    // Преобразование Person в UserDto
     private UserDto convertToUserDto(Person person) {
-        // Преобразуем объект Person в UserDto
         return new UserDto(
-                null, // Можно присваивать ID из базы данных позже
-                person.getFirstName() + " " + person.getLastName(), // Пример для username
+                null,
+                person.getFirstName() + " " + person.getLastName(),
                 person.getContactInfo().getEmail(),
                 person.getContactInfo().getPhone(),
-                "About " + person.getFirstName() // Просто пример для aboutMe
+                "About " + person.getFirstName()
         );
     }
 }

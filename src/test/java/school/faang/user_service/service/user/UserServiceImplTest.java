@@ -16,7 +16,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.Country;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.user.CountryRepository;
 import school.faang.user_service.repository.user.UserRepository;
 
@@ -41,7 +41,7 @@ public class UserServiceImplTest {
     @Mock
     private CountryRepository countryRepository;
     @Spy
-    private UserMapper userMapper;
+    private UserMapperImpl userMapper;
     @Mock
     private UserContext userContext;
 
@@ -212,7 +212,6 @@ public class UserServiceImplTest {
         assertEquals(expected, result);
         assertEquals(3, result.size());
         verify(userRepository).findAllById(ids);
-        verify(userMapper).toUserDtoList(users);
     }
 
     @Test

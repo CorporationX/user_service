@@ -19,7 +19,6 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.user.CountryRepository;
 import school.faang.user_service.repository.user.UserRepository;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;

@@ -1,7 +1,6 @@
 package school.faang.user_service.service.event;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -21,11 +20,11 @@ public class EventService {
 
     public EventService(
             EventRepository eventRepository,
-            @Qualifier("expiredEventTaskExecutor") ThreadPoolTaskExecutor executor,
+            ThreadPoolTaskExecutor expiredEventTaskExecutor,
             ChunkDeletionService chunkDeletionService
     ) {
         this.eventRepository = eventRepository;
-        this.executor = executor;
+        this.executor = expiredEventTaskExecutor;
         this.chunkDeletionService = chunkDeletionService;
     }
 

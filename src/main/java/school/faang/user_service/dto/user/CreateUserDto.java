@@ -3,6 +3,8 @@ package school.faang.user_service.dto.user;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.Locale;
+
 public record CreateUserDto(
         @NotBlank(message = "Name should be present!")
         String username,
@@ -11,6 +13,7 @@ public record CreateUserDto(
         @NotBlank(message = "Password should be present!")
         String password,
         @NotNull(message = "Country id should be present!")
-        Long countryId
+        Long countryId,
+        Locale locale
 ) {
 }

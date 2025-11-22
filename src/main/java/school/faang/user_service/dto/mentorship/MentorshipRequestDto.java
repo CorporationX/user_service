@@ -3,7 +3,7 @@ package school.faang.user_service.dto.mentorship;
 import jakarta.validation.constraints.NotNull;
 
 
-public record MentorshipDtoRequest(
+public record MentorshipRequestDto(
     @NotNull
     Long mentorId,
     @NotNull

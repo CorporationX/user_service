@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.mentorship;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import school.faang.user_service.dto.mentorship.MentorshipDtoRequest;
+import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
@@ -27,7 +27,7 @@ public class MentorshipController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public void addMentorship(@RequestBody @Valid MentorshipDtoRequest mentorshipDto) {
+    public void addMentorship(@RequestBody @Valid MentorshipRequestDto mentorshipDto) {
         mentorshipService.addMentorship(mentorshipDto.mentorId(), mentorshipDto.menteeId());
     }
 

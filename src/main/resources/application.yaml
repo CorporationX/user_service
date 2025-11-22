@@ -44,3 +44,7 @@ user:
 mentorship:
   months:
     limit: 3
+
+recommendation:
+  months:
+    limit: 6

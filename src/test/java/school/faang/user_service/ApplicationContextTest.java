@@ -48,6 +48,5 @@ class ApplicationContextTest {
 
     @Test
     void contextLoads() {
-
     }
 }

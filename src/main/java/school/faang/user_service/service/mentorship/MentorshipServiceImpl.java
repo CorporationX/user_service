@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.event.MentorshipStartEvent;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.ConflictException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
+import school.faang.user_service.service.publisher.RedisPublisher;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +24,7 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     private final MentorshipRepository mentorshipRepository;
     private final UserMapper userMapper;
+    private final RedisPublisher redisPublisher;
 
     @Override
     @Transactional
@@ -45,7 +48,10 @@ public class MentorshipServiceImpl implements MentorshipService {
         mentors.add(mentor);
         mentorshipRepository.save(mentee);
 
-        log.info("Mentorship added successfully: mentorId={}, menteeId={}", mentorId, menteeId);
+        MentorshipStartEvent event = new MentorshipStartEvent(mentorId, menteeId);
+        redisPublisher.publish(event);
+
+        log.info("Mentorship added successfully and event published: mentorId={}, menteeId={}", mentorId, menteeId);
     }
 
     @Override

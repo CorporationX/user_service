@@ -20,6 +20,8 @@ spring:
     redis:
       port: 6379
       host: localhost
+      chanel:
+        mentorship: "mentorship_channel"
 
   servlet:
     multipart:

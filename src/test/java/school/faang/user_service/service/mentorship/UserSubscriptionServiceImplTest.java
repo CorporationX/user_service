@@ -6,13 +6,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.kafka.FollowerEvent;
 import school.faang.user_service.dto.user.CountResponseDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ForbiddenException;
+import school.faang.user_service.kafka.producer.FollowerProducer;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.repository.ProjectSubscriptionRepository;
 import school.faang.user_service.repository.user.SubscriptionRepository;
 import school.faang.user_service.service.user.UserSubscriptionServiceImpl;
 
@@ -24,8 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -37,6 +42,12 @@ public class UserSubscriptionServiceImplTest {
 
     @Mock
     private SubscriptionRepository subscriptionRepository;
+
+    @Mock
+    private ProjectSubscriptionRepository projectSubscriptionRepository;
+
+    @Mock
+    private FollowerProducer followerProducer;
 
     @Spy
     private UserMapper userMapper = new UserMapperImpl();
@@ -55,6 +66,7 @@ public class UserSubscriptionServiceImplTest {
 
         verify(subscriptionRepository).existsByFollowerIdAndFolloweeId(followerId, followeeId);
         verify(subscriptionRepository).followUser(followerId, followeeId);
+        verify(followerProducer, times(1)).sendToKafka(any(FollowerEvent.class));
         verifyNoMoreInteractions(subscriptionRepository);
     }
 
@@ -182,4 +194,27 @@ public class UserSubscriptionServiceImplTest {
         verifyNoMoreInteractions(subscriptionRepository, userMapper);
     }
 
+    @Test
+    public void followNonExistentProjectOrByNonExistentfollower() {
+        long anyLong = 1L;
+        when(projectSubscriptionRepository.existsByFollowerIdAndProjectId(anyLong, anyLong)).thenReturn(false);
+
+        assertThrows(DataValidationException.class, () -> userSubscriptionServiceImpl.followProject(anyLong, anyLong));
+    }
+
+    @Test
+    public void followProjectSuccessfullyFollows() {
+        long anyLong = 1L;
+
+        when(projectSubscriptionRepository.existsByFollowerIdAndProjectId(anyLong, anyLong)).thenReturn(true);
+
+        userSubscriptionServiceImpl.followProject(anyLong, anyLong);
+
+        verify(projectSubscriptionRepository, times(1))
+                .existsByFollowerIdAndProjectId(anyLong, anyLong);
+
+        verify(projectSubscriptionRepository, times(1)).followProject(anyLong, anyLong);
+
+        verify(followerProducer, times(1)).sendToKafka(any(FollowerEvent.class));
+    }
 }

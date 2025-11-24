@@ -75,4 +75,6 @@ public interface UserSubscriptionService {
      * @return список объектов {@link UserDto}, представляющих пользователей, на которых оформлены подписки
      */
     List<UserDto> getFollowees(long followerId);
+
+    void followProject(long followerId, long projectId);
 }

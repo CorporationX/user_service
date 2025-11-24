@@ -17,6 +17,10 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
   data:
+    kafka:
+      topics:
+        follower-event:
+          topic_name: follower-event
     redis:
       port: 6379
       host: localhost

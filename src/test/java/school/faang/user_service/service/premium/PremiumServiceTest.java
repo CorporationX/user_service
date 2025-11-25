@@ -1,4 +1,4 @@
-package school.faang.user_service.repository.service.premium;
+package school.faang.user_service.service.premium;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.client.dto.PaymentRequest;
 import school.faang.user_service.client.dto.PaymentResponse;
 import school.faang.user_service.client.payment.PaymentServiceClient;
+import school.faang.user_service.dto.premium.PremiumBoughtEvent;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPurchaseAttempt;
@@ -62,6 +63,9 @@ class PremiumServiceTest {
     
     @Mock
     private PremiumCacheService premiumCacheService;
+
+    @Mock
+    private PremiumBoughtEventPublisher eventPublisher;
 
     @InjectMocks
     private PremiumService premiumService;
@@ -146,6 +150,7 @@ class PremiumServiceTest {
         verify(premiumCacheService).setActiveUntil(eq(1L), any(LocalDateTime.class));
         // Once in getOrCreateAttempt, once in processPayment, once in markAttemptCompleted
         verify(attemptRepository, times(3)).save(any(PremiumPurchaseAttempt.class));
+        verify(eventPublisher).publish(any(PremiumBoughtEvent.class));
     }
 
     @Test
@@ -181,6 +186,7 @@ class PremiumServiceTest {
         assertThat(result).isNotNull();
         verify(premiumRepository).save(existingPremium);
         verify(premiumCacheService).setActiveUntil(eq(1L), any(LocalDateTime.class));
+        verify(eventPublisher).publish(any(PremiumBoughtEvent.class));
     }
 
     @Test

@@ -227,12 +227,17 @@ public class PremiumService {
         return Math.abs(UUID.nameUUIDFromBytes(paymentNumber.getBytes()).getMostSignificantBits());
     }
 
-    private void publishPremiumBoughtEvent(long userId, PremiumPeriod period, BigDecimal amount, LocalDateTime purchaseDateTime) {
-        PremiumBoughtEvent builder = PremiumBoughtEvent.builder()
+    private void publishPremiumBoughtEvent(
+            long userId,
+            PremiumPeriod period,
+            BigDecimal amount,
+            LocalDateTime purchaseDateTime) {
+        PremiumBoughtEvent event = PremiumBoughtEvent.builder()
                 .userId(userId)
                 .paymentAmount(amount)
                 .subscriptionDurationMonths(period.getMonths())
                 .purchaseDateTime(purchaseDateTime)
                 .build();
+        boughtEventPublisher.publish(event);
     }
 }

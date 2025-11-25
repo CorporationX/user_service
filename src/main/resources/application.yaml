@@ -18,6 +18,9 @@ spring:
     redis:
       port: 6379
       host: localhost
+      channel:
+        premium-bought: premium_bought_channel
+        mentorship: "mentorship_channel"
 
   servlet:
     multipart:

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.client.payment.PaymentServiceClient;
 import school.faang.user_service.client.dto.PaymentRequest;
 import school.faang.user_service.client.dto.PaymentResponse;
+import school.faang.user_service.dto.premium.PremiumBoughtEvent;
 import school.faang.user_service.enums.PaymentStatus;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.entity.user.User;
@@ -38,6 +39,7 @@ public class PremiumService {
     private final PaymentServiceClient paymentClient;
     private final PremiumMapper premiumMapper;
     private final PremiumCacheService premiumCacheService;
+    private final PremiumBoughtEventPublisher boughtEventPublisher;
 
     @Transactional
     public PremiumDto buyPremium(long userId, PremiumPeriod period) {
@@ -63,6 +65,8 @@ public class PremiumService {
         Premium premium = createOrExtendPremium(user, period, paymentNumber, verificationCode);
 
         markAttemptCompleted(attempt);
+
+        publishPremiumBoughtEvent(userId, period, premium.getAmount(), LocalDateTime.now());
 
         return premiumMapper.toDto(premium);
     }
@@ -221,5 +225,14 @@ public class PremiumService {
 
     private long toLongPaymentNumber(String paymentNumber) {
         return Math.abs(UUID.nameUUIDFromBytes(paymentNumber.getBytes()).getMostSignificantBits());
+    }
+
+    private void publishPremiumBoughtEvent(long userId, PremiumPeriod period, BigDecimal amount, LocalDateTime purchaseDateTime) {
+        PremiumBoughtEvent builder = PremiumBoughtEvent.builder()
+                .userId(userId)
+                .paymentAmount(amount)
+                .subscriptionDurationMonths(period.getMonths())
+                .purchaseDateTime(purchaseDateTime)
+                .build();
     }
 }

@@ -20,6 +20,7 @@ import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.user.CountryRepository;
 import school.faang.user_service.repository.user.UserRepository;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -232,33 +233,33 @@ public class UserServiceImplTest {
     @SuppressWarnings("checkstyle:LineLength")
     @Test
     void addStudents_parsesCsvAndReturnsUserDtos() throws IOException {
-        String csv = """
-                firstName,lastName,yearOfBirth,group,studentID,email,phone,street,city,state,country,postalCode,faculty,yearOfStudy,major,GPA,status,admissionDate,graduationDate,degree,institution,completionYear,scholarship,employer
-                John,Doe,1998,A,123456,johndoe@example.com,+1-123-456-7890,123 Main Street,New York,NY,USA,10001,Computer Science,3,Software Engineering,3.8,Active,2016-09-01,2020-05-30,High School Diploma,XYZ High School,2016,true,XYZ Technologies
-                Jane,Smith,1997,B,654321,janesmith@example.com,+1-987-654-3210,456 Second St,Boston,MA,USA,12345,Math,4,Statistics,3.9,Active,2015-09-01,2019-05-30,Bachelor,ABC University,2015,true,ABC Corp
-                """;
+        ClassLoader classLoader = getClass().getClassLoader();
+        try (InputStream is = classLoader.getResourceAsStream("students.csv")) {
+            assertNotNull(is.toString(), "students.csv not found in test resources!");
+            byte[] fileContent = is.readAllBytes();
 
-        MockMultipartFile file = new MockMultipartFile(
-                "students.csv",                 // имя файла (может быть любое)
-                "students.csv",                 // оригинальное имя файла
-                "text/csv",                     // content type
-                csv.getBytes()                  // данные файла
-        );
+            MockMultipartFile multipartFile = new MockMultipartFile(
+                    "students",      // поле формы (любое, если неважно)
+                    "students.csv",  // оригинальное имя файла
+                    "text/csv",
+                    fileContent
+            );
 
-        List<UserDto> userDtos = userService.addStudents(file);
+            List<UserDto> userDtos = userService.addStudents(multipartFile);
 
-        assertNotNull(userDtos);
-        assertEquals(2, userDtos.size());
+            assertNotNull(userDtos);
+            assertEquals(2, userDtos.size());
 
-        UserDto first = userDtos.get(0);
-        assertEquals("John Doe", first.username());
-        assertEquals("johndoe@example.com", first.email());
-        assertEquals("+1-123-456-7890", first.phone());
+            UserDto first = userDtos.get(0);
+            assertEquals("John Doe", first.username());
+            assertEquals("johndoe@example.com", first.email());
+            assertEquals("+1-123-456-7890", first.phone());
 
-        UserDto second = userDtos.get(1);
-        assertEquals("Jane Smith", second.username());
-        assertEquals("janesmith@example.com", second.email());
-        assertEquals("+1-987-654-3210", second.phone());
+            UserDto second = userDtos.get(1);
+            assertEquals("Jane Smith", second.username());
+            assertEquals("janesmith@example.com", second.email());
+            assertEquals("+1-987-654-3210", second.phone());
+        }
     }
 
     private UserDto createUserDto(long id) {

@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user;
 
+import com.fasterxml.jackson.databind.MappingIterator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,14 +20,17 @@ import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.csvmapper.StudentCsvRow;
 import school.faang.user_service.repository.user.CountryRepository;
 import school.faang.user_service.repository.user.UserRepository;
 import school.faang.user_service.utils.PasswordUtils;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -91,62 +95,61 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> addStudents(MultipartFile file) throws IOException {
         List<UserDto> userDtos = new ArrayList<>();
 
-        InputStreamReader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
+        CsvMapper csvMapper = new CsvMapper();
+        CsvSchema schema = CsvSchema.emptySchema().withHeader(); // с заголовками в первой строке
 
-        try (BufferedReader br = new BufferedReader(reader)) {
-            String line;
-            br.readLine();
+        // Маппим все строки файла в объекты StudentCsvRow
+        try (
+                InputStream input = file.getInputStream();
+                Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8)
+        ) {
+            MappingIterator<StudentCsvRow> it =
+                    csvMapper.readerFor(StudentCsvRow.class).with(schema).readValues(reader);
 
-            while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
+            while (it.hasNext()) {
+                StudentCsvRow row = it.next();
 
+                // Cоздание Person и прочее ― как у вас, только заменяете values[индекс] на row.getXxx()
                 Person person = new Person();
-                person.setFirstName(values[0].trim());
-                person.setLastName(values[1].trim());
-                person.setYearOfBirth(Integer.parseInt(values[2].trim()));
-                person.setGroup(values[3].trim());
-                person.setStudentId(values[4].trim());
+                person.setFirstName(row.getFirstName());
+                person.setLastName(row.getLastName());
+                person.setYearOfBirth(row.getYearOfBirth());
+                person.setGroup(row.getGroup());
+                person.setStudentId(row.getStudentId());
 
                 ContactInfo contactInfo = new ContactInfo();
-                contactInfo.setEmail(values[5].trim());
-                contactInfo.setPhone(values[6].trim());
+                contactInfo.setEmail(row.getEmail());
+                contactInfo.setPhone(row.getPhone());
 
-                Address address = new Address(values[7].trim(), values[8].trim(),
-                        values[9].trim(), values[10].trim(), values[11].trim());
+                Address address = new Address(row.getStreet(), row.getCity(),
+                        row.getRegion(), row.getZip(), row.getCountry());
                 contactInfo.setAddress(address);
                 person.setContactInfo(contactInfo);
 
                 Education education = new Education(
-                        values[12].trim(),
-                        Integer.parseInt(values[13].trim()),
-                        values[14].trim(),
-                        Double.parseDouble(values[15].trim())
+                        row.getDegreeName(),
+                        row.getDegreeYear(),
+                        row.getInstitution(),
+                        row.getGpa()
                 );
+                person.setEducations(Collections.singletonList(education));
 
-                List<Education> educations = new ArrayList<>();
-                educations.add(education);
-
-                person.setEducations(educations);
-
-
-                person.setStatus(values[16].trim());
-                person.setAdmissionDate(values[17].trim());
-                person.setGraduationDate(values[18].trim());
-
-                List<PreviousEducation> previousEducation = new ArrayList<>();
-                previousEducation.add(new PreviousEducation(values[19].trim(),
-                        values[20].trim(), Integer.parseInt(values[21].trim())));
-                person.setPreviousEducation(previousEducation);
-
-                person.setScholarship(Boolean.parseBoolean(values[22].trim()));
-                person.setEmployer(values[23].trim());
+                person.setStatus(row.getStatus());
+                person.setAdmissionDate(row.getAdmissionDate());
+                person.setGraduationDate(row.getGraduationDate());
+                person.setPreviousEducation(
+                        Collections.singletonList(
+                                new PreviousEducation(row.getPrevDegName(), row.getPrevInstitution(), row.getPrevYear())
+                        )
+                );
+                person.setScholarship(row.getScholarship());
+                person.setEmployer(row.getEmployer());
 
                 User user = userMapper.personToUser(person);
-
                 String password = PasswordUtils.generatePassword(minPasswordLength);
                 user.setPassword(password);
 
-                String countryName = person.getContactInfo().getAddress().getCountry();
+                String countryName = row.getCountry();
                 Country country = countryRepository.findByTitle(countryName)
                         .orElseGet(() -> {
                             Country c = new Country();
@@ -159,7 +162,6 @@ public class UserServiceImpl implements UserService {
 
                 UserDto userDto = convertToUserDto(person);
                 userDtos.add(userDto);
-
             }
         } catch (IOException e) {
             e.printStackTrace();

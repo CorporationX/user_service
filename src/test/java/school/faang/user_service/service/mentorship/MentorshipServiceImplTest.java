@@ -15,6 +15,7 @@ import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.publisher.RedisPublisher;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -155,6 +156,7 @@ class MentorshipServiceImplTest {
 
         User mentee = new User();
         mentee.setId(menteeId);
+        mentee.setFollowers(new ArrayList<>());
 
         User user = new User();
         user.setId(userId);
@@ -197,6 +199,7 @@ class MentorshipServiceImplTest {
 
         User mentor = new User();
         mentor.setId(mentorId);
+        mentor.setFollowers(new ArrayList<>());
 
         user.getMentors().add(mentor);
 

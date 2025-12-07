@@ -27,8 +27,18 @@ public abstract class UserMapper {
 
     public abstract void update(UpdateUserDto userDto, @MappingTarget User entity);
 
+    @Mapping(source = "contactPreference.preference", target = "preference")
+    @Mapping(target = "followersIds", expression = "java(mapFollowers(user))")
     @Mapping(target = "pictures", source = "user", qualifiedByName = "mapPictures")
     public abstract UserDto toUserDto(User user);
+
+    public abstract List<UserDto> toUserDtos(List<User> users);
+
+    protected List<Long> mapFollowers(User user) {
+        return user.getFollowers().stream()
+                .map(User::getId)
+                .toList();
+    }
 
     @Named("mapPictures")
     protected List<PictureDto> mapPictures(User user) {

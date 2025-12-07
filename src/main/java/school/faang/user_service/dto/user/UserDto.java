@@ -2,6 +2,7 @@ package school.faang.user_service.dto.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import school.faang.user_service.dto.picture.PictureDto;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 import java.util.List;
 
@@ -25,6 +26,15 @@ public record UserDto(
         Integer experience,
 
         @Schema(description = "Ссылка на аватарку и тип аватарки «medium» или «small»")
-        List<PictureDto> pictures
+        List<PictureDto> pictures,
+
+        @Schema(description = "Уникальные идентификаторы подписчиков пользователя", example = "1, 2, 3")
+        List<Long> followersIds,
+
+        @Schema(description = "Уникальный идентификатор диалога пользователя с телеграм-ботом", example = "123456")
+        Long chatId,
+
+        @Schema(description = "Предпочитаемый способ получения уведомлений", example = "TELEGRAM")
+        PreferredContact preference
 ) {
 }

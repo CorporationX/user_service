@@ -13,10 +13,13 @@ import school.faang.user_service.dto.user.UpdateUserDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.user.CountryRepository;
 import school.faang.user_service.repository.user.UserRepository;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -69,11 +72,29 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserDto(user);
     }
 
+    @Override
+    @Transactional
+    public UserDto updateChatIdByEmail(long chatId, String email) { //TODO: изменить параметры на @RequestBody
+        User currentUser = userRepository.findByEmailIgnoreCase(email);
+        if (currentUser == null) {
+            throw new EntityNotFoundException(String.format("User with email '%s' does not exist", email));
+        }
+        currentUser.setChatId(chatId);
+        return userMapper.toUserDto(currentUser);
+    }
+
     @Transactional
     @Override
     public UserDto getUserById(long userId) {
         User user = userRepository.getByIdOrThrow(userId);
         return userMapper.toUserDto(user);
+    }
+
+    @Override
+    @Transactional
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        List<User> users = userRepository.findAllById(ids);
+        return userMapper.toUserDtos(users);
     }
 
     private void createValidation(CreateUserDto userDto, int minPasswordLength) {
@@ -83,7 +104,7 @@ public class UserServiceImpl implements UserService {
         if (userDto.password().length() < minPasswordLength) {
             throw new DataValidationException("Password should be more than " + minPasswordLength + " symbols!");
         }
-        if (userRepository.existsByEmail(userDto.email())) {
+        if (userRepository.existsByEmailIgnoreCase(userDto.email())) {
             throw new DataValidationException("User with email " + userDto.email() + " already exists!");
         }
         if (userRepository.existsByPhone(userDto.phone())) {

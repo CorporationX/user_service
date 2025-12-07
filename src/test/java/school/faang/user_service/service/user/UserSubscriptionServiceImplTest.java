@@ -17,6 +17,7 @@ import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.user.SubscriptionRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -339,6 +340,7 @@ class UserSubscriptionServiceImplTest {
                 .username(username)
                 .phone(phone)
                 .experience(experience)
+                .followers(new ArrayList<>())
                 .build();
     }
 

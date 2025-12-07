@@ -4,6 +4,8 @@ import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.dto.user.UpdateUserDto;
 import school.faang.user_service.dto.user.UserDto;
 
+import java.util.List;
+
 /**
  * Сервис для управления пользователями.
  * Предоставляет методы для создания, обновления и получения информации о пользователях.
@@ -58,6 +60,15 @@ public interface UserService {
     UserDto update(long userId, UpdateUserDto userDto);
 
     /**
+     * Обновляет идентификатор диалога с телеграм-ботом
+     *
+     * @param chatId идентификатор диалога с телеграм-ботом
+     * @param email  почта пользователя для аутентификации в телеграм-боте
+     * @return объект {@link UserDto}, представляющий обновлённого пользователя
+     */
+    UserDto updateChatIdByEmail(long chatId, String email); //TODO: изменить параметры на @RequestBody
+
+    /**
      * Возвращает информацию о пользователе по его идентификатору.
      * <p>
      * Если пользователь с указанным идентификатором не найден,
@@ -67,6 +78,20 @@ public interface UserService {
      * @return объект {@link UserDto}, содержащий данные пользователя
      */
     UserDto getUserById(long userId);
+
+    /**
+     * Возвращает информацию о пользователях по их идентификатору
+     * <p>
+     * Условия:
+     * <ul>
+     *     <li>Пользователи с указанными {@code ids} должны существовать —
+     *         иначе выбрасывается {@code EntityNotFoundException}.</li>
+     * </ul>
+     *
+     * @param ids идентификаторы пользователей
+     * @return объект {@code List<}{@link UserDto}{@code >}, содержащий информацию о пользователях
+     */
+    List<UserDto> getUsersByIds(List<Long> ids);
 }
 
 

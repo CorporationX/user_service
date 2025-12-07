@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  liquibase:
+    enabled: false
+
+  data:
+    redis:
+      port: 6379
+      host: localhost
+
+server:
+  port: 0
+
+logging:
+  level:
+    root: warn
+    school.faang.user_service: debug
+
+project-service:
+  url: http://localhost:8082
+
+payment-service:
+  url: http://localhost:9080
+
+user:
+  password:
+    min:
+      length: 6

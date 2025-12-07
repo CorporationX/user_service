@@ -10,12 +10,6 @@
         <property name="fileNamePattern" value="module\-info\.java$"/>
     </module>
     <module name="SuppressWarningsFilter"/>
-    <!-- https://checkstyle.org/filters/suppressionfilter.html -->
-    <module name="SuppressionFilter">
-        <property name="file" value="${org.checkstyle.google.suppressionfilter.config}"
-                  default="checkstyle-suppressions.xml" />
-        <property name="optional" value="true"/>
-    </module>
     <module name="SuppressWithNearbyTextFilter">
         <property name="nearbyTextPattern"
                   value="CHECKSTYLE.SUPPRESS\: (\w+) for ([+-]\d+) lines"/>
@@ -332,10 +326,19 @@
         </module>
         <module name="SuppressionXpathSingleFilter">
             <property name="checks" value="MethodName"/>
-            <property name="query" value="//METHOD_DEF[
-                                     ./MODIFIERS/ANNOTATION//IDENT[contains(@text, 'Test')]
-                                   ]/IDENT"/>
-            <property name="message" value="'[a-z][a-z0-9][a-zA-Z0-9]*(?:_[a-z][a-z0-9][a-zA-Z0-9]*)*'"/>
+            <property name="query" value="//METHOD_DEF[ancestor::CLASS_DEF[./IDENT[contains(@text, 'Test')]]]/IDENT"/>
+        </module>
+        <module name="SuppressionXpathSingleFilter">
+            <property name="checks" value="VariableDeclarationUsageDistance"/>
+            <property name="query" value="//METHOD_DEF[ancestor::CLASS_DEF[./IDENT[contains(@text, 'Test')]]]"/>
+        </module>
+        <module name="SuppressionXpathSingleFilter">
+            <property name="checks" value="AbbreviationAsWordInName"/>
+            <property name="query" value="//METHOD_DEF[ancestor::CLASS_DEF[./IDENT[contains(@text, 'Test')]]]/IDENT"/>
+        </module>
+        <module name="SuppressionXpathSingleFilter">
+            <property name="checks" value="LineLength"/>
+            <property name="query" value="//CLASS_DEF[./IDENT[contains(@text, 'Test')]]"/>
         </module>
         <!--<module name="SingleLineJavadoc"/>-->
         <module name="EmptyCatchBlock">
@@ -343,12 +346,6 @@
         </module>
         <module name="CommentsIndentation">
             <property name="tokens" value="SINGLE_LINE_COMMENT, BLOCK_COMMENT_BEGIN"/>
-        </module>
-        <!-- https://checkstyle.org/filters/suppressionxpathfilter.html -->
-        <module name="SuppressionXpathFilter">
-            <property name="file" value="${org.checkstyle.google.suppressionxpathfilter.config}"
-                      default="checkstyle-xpath-suppressions.xml" />
-            <property name="optional" value="true"/>
         </module>
         <module name="SuppressWarningsHolder" />
         <module name="SuppressionCommentFilter">

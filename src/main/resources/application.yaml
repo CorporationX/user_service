@@ -7,7 +7,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -22,7 +22,7 @@ spring:
       host: localhost
       channel:
         premium-bought: premium_bought_channel
-        mentorship: "mentorship_channel"
+        mentorship: mentorship_channel
 
   servlet:
     multipart:
@@ -37,12 +37,10 @@ logging:
     root: info
 
 project-service:
-  host: localhost
-  port: 8082
+  url: http://localhost:8082
 
 payment-service:
-  host: localhost
-  port: 9080
+  url: http://localhost:9080
 
 user:
   password:

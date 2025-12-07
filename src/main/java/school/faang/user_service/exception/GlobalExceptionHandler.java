@@ -69,6 +69,45 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadRequestException.class)
+    public ErrorResponse handleBadRequestException(
+            BadRequestException ex,
+            HttpServletRequest request) {
+        return new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundException.class)
+    public ErrorResponse handleNotFoundException(
+            NotFoundException ex,
+            HttpServletRequest request) {
+        return new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                "Not Found",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+    }
+
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    @ExceptionHandler(PaymentFailedException.class)
+    public ErrorResponse handlePaymentFailedException(
+            PaymentFailedException ex,
+            HttpServletRequest request) {
+        return new ErrorResponse(
+                HttpStatus.BAD_GATEWAY.value(),
+                "Bad Gateway",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+    }
+
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(ConflictException.class)
     public ErrorResponse handleConflictException(

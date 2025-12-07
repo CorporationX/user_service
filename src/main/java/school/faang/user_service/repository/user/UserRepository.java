@@ -12,7 +12,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByUsername(String username);
 
-    boolean existsByEmail(String email);
+    boolean existsByEmailIgnoreCase(String email);
 
     boolean existsByPhone(String phone);
 
@@ -34,6 +34,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByUsernameLike(String username);
 
     User findByEmailIgnoreCase(String email);
+
+    @Query(nativeQuery = true, value = """
+            SELECT u.*, cp.preference FROM users u
+            JOIN contact_preferences cp ON u.id = cp.user_id
+            WHERE u.id IN (?1)
+            """)
+    List<User> findUsersByIdsWithContactPreference(List<Long> ids);
 
     default User getByIdOrThrow(long userId) {
         return findById(userId)

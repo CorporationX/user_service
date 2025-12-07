@@ -108,8 +108,28 @@ public class MentorshipControllerTest {
         long userId = 1L;
 
         List<UserDto> mentees = List.of(
-                new UserDto(2L, "user1", "email1@test.com", "123456", "About me 1", 5, List.of()),
-                new UserDto(3L, "user2", "email2@test.com", "789012", "About me 2", 3, List.of())
+                new UserDto(
+                        2L,
+                        "user1",
+                        "email1@test.com",
+                        "123456",
+                        "About me 1",
+                        5,
+                        List.of(),
+                        null,
+                        null,
+                        null),
+                new UserDto(
+                        3L,
+                        "user2",
+                        "email2@test.com",
+                        "789012",
+                        "About me 2",
+                        3,
+                        List.of(),
+                        null,
+                        null,
+                        null)
         );
 
         when(mentorshipService.getMentees(userId)).thenReturn(mentees);
@@ -128,8 +148,28 @@ public class MentorshipControllerTest {
         long userId = 1L;
 
         List<UserDto> mentors = List.of(
-                new UserDto(2L, "mentor1", "mentor1@test.com", "111111", "About mentor 1", 10, List.of()),
-                new UserDto(3L, "mentor2", "mentor2@test.com", "222222", "About mentor 2", 15, List.of())
+                new UserDto(
+                        2L,
+                        "mentor1",
+                        "mentor1@test.com",
+                        "111111",
+                        "About mentor 1",
+                        10,
+                        List.of(),
+                        null,
+                        null,
+                        null),
+                new UserDto(
+                        3L,
+                        "mentor2",
+                        "mentor2@test.com",
+                        "222222",
+                        "About mentor 2",
+                        15,
+                        List.of(),
+                        null,
+                        null,
+                        null)
         );
 
         when(mentorshipService.getMentors(userId)).thenReturn(mentors);

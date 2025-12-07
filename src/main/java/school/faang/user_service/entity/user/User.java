@@ -62,6 +62,9 @@ public class User {
     @Column(name = "phone", length = 32, unique = true)
     private String phone;
 
+    @Column(name = "chat_id", unique = true)
+    private Long chatId;
+
     @Column(name = "password", length = 128, nullable = false)
     private String password;
 
@@ -94,7 +97,7 @@ public class User {
     @ManyToMany
     @JoinTable(name = "subscription",
             joinColumns = @JoinColumn(name = "followee_id"), inverseJoinColumns = @JoinColumn(name = "follower_id"))
-    private List<User> followers;
+    private List<User> followers = new ArrayList<>();
 
     @ManyToMany(mappedBy = "followers")
     private List<User> followees;

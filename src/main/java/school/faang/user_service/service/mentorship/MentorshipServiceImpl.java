@@ -11,7 +11,7 @@ import school.faang.user_service.exception.ConflictException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
-import school.faang.user_service.service.publisher.RedisPublisher;
+import school.faang.user_service.service.publisher.MentorshipStartPublisher;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +24,7 @@ public class MentorshipServiceImpl implements MentorshipService {
 
     private final MentorshipRepository mentorshipRepository;
     private final UserMapper userMapper;
-    private final RedisPublisher redisPublisher;
+    private final MentorshipStartPublisher mentorshipStartPublisher;
 
     @Override
     @Transactional
@@ -49,7 +49,7 @@ public class MentorshipServiceImpl implements MentorshipService {
         mentorshipRepository.save(mentee);
 
         MentorshipStartEvent event = new MentorshipStartEvent(mentorId, menteeId);
-        redisPublisher.publish(event);
+        mentorshipStartPublisher.publish(event);
 
         log.info("Mentorship added successfully and event published: mentorId={}, menteeId={}", mentorId, menteeId);
     }

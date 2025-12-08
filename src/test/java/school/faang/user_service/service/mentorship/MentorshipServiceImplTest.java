@@ -13,7 +13,7 @@ import school.faang.user_service.exception.ConflictException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
-import school.faang.user_service.service.publisher.RedisPublisher;
+import school.faang.user_service.service.publisher.MentorshipStartPublisher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ class MentorshipServiceImplTest {
     private MentorshipRepository mentorshipRepository;
 
     @Mock
-    private RedisPublisher redisPublisher;
+    private MentorshipStartPublisher mentorshipStartPublisher;
 
     @Spy
     private UserMapperImpl userMapper;
@@ -64,7 +64,7 @@ class MentorshipServiceImplTest {
         verify(mentorshipRepository, times(1)).getByIdOrThrow(mentorId);
         verify(mentorshipRepository, times(1)).getByIdOrThrow(menteeId);
         verify(mentorshipRepository, times(1)).save(mentee);
-        verify(redisPublisher, times(1)).publish(any(MentorshipStartEvent.class));
+        verify(mentorshipStartPublisher, times(1)).publish(any(MentorshipStartEvent.class));
     }
 
     @Test
@@ -89,7 +89,7 @@ class MentorshipServiceImplTest {
 
         verify(mentorshipRepository, times(1)).getByIdOrThrow(mentorId);
         verify(mentorshipRepository, times(1)).getByIdOrThrow(menteeId);
-        verify(redisPublisher, never()).publish(any(MentorshipStartEvent.class));
+        verify(mentorshipStartPublisher, never()).publish(any(MentorshipStartEvent.class));
     }
 
     @Test

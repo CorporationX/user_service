@@ -8,7 +8,7 @@ import school.faang.user_service.dto.event.MentorshipStartEvent;
 
 @RequiredArgsConstructor
 @Component
-public class RedisPublisher {
+public class MentorshipStartPublisher {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic mentorshipChannel;

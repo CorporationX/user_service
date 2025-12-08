@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import school.faang.user_service.client.dto.PaymentResponse;
 import school.faang.user_service.client.payment.PaymentServiceClient;
+import school.faang.user_service.dto.premium.PremiumBoughtEvent;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPurchaseAttempt;
@@ -22,9 +23,6 @@ import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.premium.PremiumPurchaseAttemptRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.repository.user.UserRepository;
-import school.faang.user_service.service.premium.PremiumCacheService;
-import school.faang.user_service.service.premium.PremiumBoughtEventPublisher;
-import school.faang.user_service.dto.premium.PremiumBoughtEvent;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

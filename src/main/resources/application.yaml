@@ -63,3 +63,9 @@ avatar:
   dicebear:
     base-url: "https://api.dicebear.com/9.x/open-peeps/png"
     default-size: 256
+
+scheduler:
+  thread-pool-size: 10
+  batch-size: 100
+  expired-events:
+    cron: "0 0 2 * * ?"  # каждый день в 2 ночи

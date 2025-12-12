@@ -3,7 +3,9 @@ package school.faang.user_service.repository.recommendation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.entity.user.Skill;
 
 import java.util.List;
 
@@ -43,4 +45,9 @@ public interface SkillOfferRepository extends JpaRepository<SkillOffer, Long> {
             WHERE r.receiver.id = :userId
             """)
     List<SkillOffer> findAllByUserId(long userId);
+
+    @Query("SELECT so FROM SkillOffer so WHERE so.offeredUser.id = :userId")
+    List<Skill> findSkillsOfferedToUser(@Param("userId") long userId);
+
+    List<SkillOffer> findAllBySkillIdAndOfferedUserId(long skillId, long userId);
 }

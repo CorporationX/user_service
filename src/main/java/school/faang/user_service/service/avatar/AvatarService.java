@@ -47,5 +47,5 @@ public interface AvatarService {
      * @param userId ID пользователя, чей аватар необходимо удалить.
      * @return {@code String}, содержащий URL нового аватара по умолчанию.
      */
-    String deleteAvatar(long userId);
+    UserProfilePic deleteAvatar(long userId);
 }

@@ -9,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.entity.user.UserProfilePic;
@@ -22,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.anyString;
@@ -33,6 +31,10 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AvatarServiceImplTest {
+
+
+    @Mock
+    private RandomAvatarService randomAvatarService;
 
     @Mock
     private UserRepository userRepository;
@@ -53,8 +55,6 @@ class AvatarServiceImplTest {
         user.setId(userId);
         user.setUsername("testuser");
         file = new MockMultipartFile("file", "test.png", "image/png", new byte[1024]);
-        ReflectionTestUtils.setField(avatarService, "dicebearBaseUrl", "http://test.com");
-        ReflectionTestUtils.setField(avatarService, "dicebearDefaultSize", 256);
     }
 
     @Nested
@@ -129,17 +129,21 @@ class AvatarServiceImplTest {
             UserProfilePic pic = new UserProfilePic();
             pic.setFileId("avatars/1/some-id.png");
             pic.setSmallFileId("avatars/1/some-small-id.png");
+            UserProfilePic randomPic = new UserProfilePic();
+            randomPic.setFileId("random-avatars/1/rand-id.png");
+            randomPic.setSmallFileId("random-avatars/1/rand-small-id.png");
             user.setUserProfilePic(pic);
 
             when(userRepository.getByIdOrThrow(userId)).thenReturn(user);
+            when(randomAvatarService.generateRandomAvatarForUser(user.getUsername())).thenReturn(randomPic);
 
-            final String resultUrl = avatarService.deleteAvatar(userId);
+            final UserProfilePic result = avatarService.deleteAvatar(userId);
 
             verify(s3service, times(1)).deleteFileFromS3("avatars/1/some-id.png");
             verify(s3service, times(1)).deleteFileFromS3("avatars/1/some-small-id.png");
             verify(userRepository, times(1)).save(user);
-            assertTrue(resultUrl.contains("http://test.com"));
-            assertEquals(resultUrl, user.getUserProfilePic().getFileId());
+            assertEquals(result.getFileId(), randomPic.getFileId());
+            assertEquals(result.getSmallFileId(), randomPic.getSmallFileId());
         }
 
         @Test

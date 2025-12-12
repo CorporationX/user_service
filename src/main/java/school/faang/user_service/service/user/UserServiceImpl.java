@@ -12,12 +12,18 @@ import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.dto.user.UpdateUserDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.user.User;
+import school.faang.user_service.entity.user.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.ForbiddenException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.user.CountryRepository;
 import school.faang.user_service.repository.user.UserRepository;
+import school.faang.user_service.service.avatar.RandomAvatarService;
+import school.faang.user_service.service.s3.S3service;
+
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import java.util.List;
 
@@ -26,14 +32,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Value("${user.password.min.length}")
-    private int minPasswordLength;
+    private final S3service s3service;
     private final UserRepository userRepository;
     private final CountryRepository countryRepository;
     private final UserMapper userMapper;
     private final UserContext userContext;
+    private final RandomAvatarService randomAvatarService;
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Value("${user.password.min.length}")
+    private int minPasswordLength;
 
     @Transactional
     @Override
@@ -42,6 +51,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toUser(userDto);
         user.setActive(true);
         user.setCountry(countryRepository.getByIdOrThrow(userDto.countryId()));
+        user.setUserProfilePic(randomAvatarService.generateRandomAvatarForUser(userDto.username()));
         user = userRepository.save(user);
         log.info("User {} created", user.getId());
         return userMapper.toUserDto(user);
@@ -52,6 +62,7 @@ public class UserServiceImpl implements UserService {
     public Long delete(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new DataValidationException("User with id " + userId + " not found!"));
+        deleteAvatarIfStoredInS3(user.getUserProfilePic());
         userRepository.delete(user);
         log.info("User {} deleted", user.getId());
         return user.getId();
@@ -59,15 +70,22 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public UserDto update(long userId, UpdateUserDto userDto) {
+    public UserDto update(long userId, UpdateUserDto updateUserDto) {
         long requesterId = userContext.getUserId();
         if (userId != requesterId) {
             throw new ForbiddenException("User " + requesterId + " doesn't match profile owner!");
         }
+
         User user = userRepository.getByIdOrThrow(userId);
-        userMapper.update(userDto, user);
-        user.setCountry(countryRepository.getByIdOrThrow(userDto.countryId()));
+        if (!updateUserDto.username().equals(user.getUsername())) {
+            deleteAvatarIfStoredInS3(user.getUserProfilePic());
+            user.setUserProfilePic(randomAvatarService.generateRandomAvatarForUser(updateUserDto.username()));
+        }
+
+        userMapper.update(updateUserDto, user);
+        user.setCountry(countryRepository.getByIdOrThrow(updateUserDto.countryId()));
         user = userRepository.save(user);
+
         log.info("User {} updated", user.getId());
         return userMapper.toUserDto(user);
     }
@@ -110,5 +128,23 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByPhone(userDto.phone())) {
             throw new DataValidationException("User with phone " + userDto.phone() + " already exists!");
         }
+    }
+
+    private void deleteAvatarIfStoredInS3(UserProfilePic pic) {
+        if (pic == null) {
+            return;
+        }
+
+        Stream.of(pic.getFileId(), pic.getSmallFileId())
+                .filter(Objects::nonNull)
+                .filter(id -> !id.startsWith("http"))
+                .forEach(id -> {
+                    try {
+                        s3service.deleteFileFromS3(id);
+                        log.info("Deleted avatar file from S3: {}", id);
+                    } catch (Exception e) {
+                        log.error("Error deleting avatar file {} from S3: ", id, e);
+                    }
+                });
     }
 }

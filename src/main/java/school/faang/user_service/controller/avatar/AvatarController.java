@@ -3,6 +3,7 @@ package school.faang.user_service.controller.avatar;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -45,7 +46,7 @@ public class AvatarController {
     )
     @ApiResponse(responseCode = "201", description = "Аватар успешно загружен",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = PictureDto.class)))
+                    array = @ArraySchema(schema = @Schema(implementation = PictureDto.class))))
     @ApiResponse(responseCode = "400", description = "Ошибка валидации", content = @Content)
     @Parameter(name = "x-user-id", required = true, in = ParameterIn.HEADER)
     public ResponseEntity<List<PictureDto>> uploadAvatar(@RequestParam("file") MultipartFile file) {
@@ -85,17 +86,21 @@ public class AvatarController {
     @DeleteMapping("/delete")
     @Operation(summary = "Удаление аватара пользователя",
             description = "Удаляет текущий аватар и устанавливает аватар по умолчанию.")
-    @ApiResponse(responseCode = "200", description = "URL нового аватара по умолчанию",
-            content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE,
-                    schema = @Schema(implementation = String.class)))
+    @ApiResponse(responseCode = "200", description = "Список новых аватаров пользователя",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(implementation = PictureDto.class))))
     @Parameter(name = "x-user-id", required = true, in = ParameterIn.HEADER)
-    public ResponseEntity<String> deleteAvatar() {
+    public ResponseEntity<List<PictureDto>> deleteAvatar() {
         long userId = userContext.getUserId();
         log.info("Received request to delete avatar for user ID: {}", userId);
 
-        String defaultImageUrl = avatarService.deleteAvatar(userId);
+        UserProfilePic defaultRandomAvatar = avatarService.deleteAvatar(userId);
+        List<PictureDto> avatarList = List.of(
+                new PictureDto(defaultRandomAvatar.getFileId(), PictureType.AVATAR_MEDIUM),
+                new PictureDto(defaultRandomAvatar.getSmallFileId(), PictureType.AVATAR_SMALL)
+        );
 
-        log.info("Successfully deleted avatar and set default for user ID: {}. New URL: {}", userId, defaultImageUrl);
-        return ResponseEntity.ok().body(defaultImageUrl);
+        log.info("Successfully deleted avatar and set default for user ID: {}. New URL: {}", userId, avatarList);
+        return ResponseEntity.ok(avatarList);
     }
 }

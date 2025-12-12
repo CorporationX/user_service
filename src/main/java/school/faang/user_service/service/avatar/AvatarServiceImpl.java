@@ -3,7 +3,6 @@ package school.faang.user_service.service.avatar;
 import com.amazonaws.SdkClientException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.retry.annotation.Retryable;
@@ -24,13 +23,9 @@ import school.faang.user_service.service.s3.S3service;
 public class AvatarServiceImpl implements AvatarService {
     private static final long MAX_AVATAR_SIZE = 5 * 1024 * 1024;
 
+    private final RandomAvatarService randomAvatarService;
     private final UserRepository userRepository;
     private final S3service s3service;
-
-    @Value("${avatar.dicebear.base-url}")
-    private String dicebearBaseUrl;
-    @Value("${avatar.dicebear.default-size}")
-    private int dicebearDefaultSize;
 
     @Override
     @Transactional
@@ -85,31 +80,18 @@ public class AvatarServiceImpl implements AvatarService {
 
     @Override
     @Transactional
-    public String deleteAvatar(long userId) {
+    public UserProfilePic deleteAvatar(long userId) {
         log.info("Received request to delete avatar for user ID: {}", userId);
         User user = userRepository.getByIdOrThrow(userId);
         deleteOldAvatarFiles(user);
 
-        String defaultAvatarUrl = String.format(
-                "%s?seed=%s&size=%d",
-                dicebearBaseUrl,
-                user.getUsername(),
-                dicebearDefaultSize
-        );
-        log.info("Generated new default avatar URL for user ID: {}", userId);
-
-        UserProfilePic userProfilePic = user.getUserProfilePic();
-        if (userProfilePic == null) {
-            userProfilePic = new UserProfilePic();
-            log.debug("Creating new UserProfilePic entity for user ID: {} to set default avatar", userId);
-        }
-        userProfilePic.setFileId(defaultAvatarUrl);
-        userProfilePic.setSmallFileId(defaultAvatarUrl);
-        user.setUserProfilePic(userProfilePic);
+        UserProfilePic randomAvatar = randomAvatarService.generateRandomAvatarForUser(user.getUsername());
+        user.setUserProfilePic(randomAvatar);
+        log.info("Generated new random avatar URL for user ID: {}", userId);
 
         userRepository.save(user);
-        log.info("Successfully set default avatar for user ID: {}", userId);
-        return defaultAvatarUrl;
+        log.info("Successfully set random avatar for user ID: {}", userId);
+        return randomAvatar;
     }
 
     @Retryable(retryFor = {SdkClientException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2))

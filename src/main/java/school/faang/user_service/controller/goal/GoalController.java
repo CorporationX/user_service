@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
@@ -28,6 +29,7 @@ import school.faang.user_service.service.goal.GoalService;
 public class GoalController {
 
     private final GoalService goalService;
+    private final UserContext userContext;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -38,7 +40,7 @@ public class GoalController {
     @PutMapping("/{goalId}")
     @ResponseStatus(HttpStatus.OK)
     public GoalDto update(@PathVariable long goalId, @Valid @RequestBody UpdateGoalDto updateGoalDto) {
-        return goalService.update(goalId, updateGoalDto);
+        return goalService.update(goalId, updateGoalDto, userContext.getUserId());
     }
 
     @DeleteMapping("/{goalId}")

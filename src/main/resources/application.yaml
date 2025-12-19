@@ -18,7 +18,10 @@ spring:
 
   data:
     kafka:
+      bootstrap_servers: localhost:9092
       topics:
+        goal-completed:
+          name: goal-completed
         profile_view:
           name: profile-view
 

@@ -11,7 +11,7 @@ public interface GoalService {
 
     GoalDto create(CreateGoalDto createGoalDto);
 
-    GoalDto update(long goalId, UpdateGoalDto updateGoalDto);
+    GoalDto update(long goalId, UpdateGoalDto updateGoalDto, long userId);
 
     void deleteGoal(long goalId);
 

@@ -9,7 +9,10 @@ import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.dto.goal.UpdateGoalDto;
+import school.faang.user_service.dto.kafka.GoalCompletedEvent;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.kafka.producer.GoalCompletedProducer;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
 
@@ -20,6 +23,7 @@ public class GoalServiceImpl implements GoalService {
     private final GoalRepository goalRepository;
     private final GoalMapper goalMapper;
     private final ValidationService validationService;
+    private final GoalCompletedProducer goalCompletedProducer;
 
     @Transactional
     @Override
@@ -34,11 +38,14 @@ public class GoalServiceImpl implements GoalService {
 
     @Transactional
     @Override
-    public GoalDto update(long goalId, UpdateGoalDto updateGoalDto) {
+    public GoalDto update(long goalId, UpdateGoalDto updateGoalDto, long userId) {
         Goal goal = goalRepository.getByIdOrThrow(goalId);
         validationService.validatePossibleToCreateOrUpdate(goal);
         goalMapper.update(updateGoalDto, goal);
         log.info("Goal with id {} was updated successfully!", goalId);
+        if (updateGoalDto.status() == GoalStatus.COMPLETED) {
+            goalCompletedProducer.sendGoalCompletedEventToKafka(new GoalCompletedEvent(userId, goalId));
+        }
         return goalMapper.toGoalDto(goal);
     }
 
@@ -73,6 +80,5 @@ public class GoalServiceImpl implements GoalService {
                 .map(goalMapper::toGoalDto)
                 .toList();
     }
-
 }
 

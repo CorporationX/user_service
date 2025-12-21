@@ -4,6 +4,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
     kotlin("jvm")
+    jacoco
     checkstyle
 }
 
@@ -91,7 +92,55 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true }
+val test by tasks.getting(Test::class) {
+    testLogging.showStandardStreams = true
+    finalizedBy("jacocoTestReport")
+}
+
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
+    }
+}
+
+val jacocoExcludes = listOf(
+    "faang.school.postservice.client.*",
+    "faang.school.postservice.config.*",
+    "faang.school.postservice.dto.*",
+    "faang.school.postservice.repository.*",
+    "faang.school.postservice.controller.*",
+    "faang.school.postservice.entity.*",
+    "faang.school.postservice.mapper.*",
+    "faang.school.postservice.exception.*",
+)
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.test)
+
+    violationRules {
+        rule {
+            element = "CLASS"
+            excludes = jacocoExcludes
+            limit {
+                counter = "INSTRUCTION"
+                value = "COVEREDRATIO"
+                minimum = "0.80".toBigDecimal()
+            }
+        }
+    }
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestReport, tasks.jacocoTestCoverageVerification)
+}
 
 tasks.bootJar {
     archiveFileName.set("service.jar")

@@ -1,5 +1,4 @@
 spring:
-
   config:
     import: optional:classpath:application.properties
 
@@ -13,12 +12,12 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
   profiles:
-    active: ${APP_ENV}
+    active: local
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
@@ -28,10 +27,23 @@ spring:
     port: ${REDIS_PORT}
     password: ${REDIS_PASSWORD}
 
+  outbox:
+    fixed-delay-ms: 5000
+
   kafka:
     bootstrap-servers: ${KAFKA_HOST}:${KAFKA_PORT}
+    consumer:
+      trustedPackage: "faang.school.user_service.dto*"
     topics:
       recommendation: "recommendation-topic"
+      post-created: "post.created"
+      post-to-feed: "post.to-feed"
+    producer:
+      acks: all
+      retries: 5
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
 
 server:
   port: 8080

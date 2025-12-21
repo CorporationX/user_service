@@ -1,5 +1,6 @@
 package school.faang.user_service.repository.user;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -46,4 +47,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     void bannedByIds(@Param("bannedIds") List<Long> bannedIds);
 
     boolean existsByIdIn(Collection<Long> ids);
+
+    @Query("SELECT f.id FROM User u JOIN u.followers f WHERE u.id = :authorId")
+    List<Long> findFollowerIdsPaged(@Param("authorId") Long authorId, Pageable pageable);
 }

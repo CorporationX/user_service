@@ -1,4 +1,4 @@
-package school.faang.user_service.messages.kafka.publusher;
+package school.faang.user_service.messages.kafka.producers;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;

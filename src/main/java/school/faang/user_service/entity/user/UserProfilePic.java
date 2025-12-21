@@ -14,4 +14,6 @@ import lombok.Setter;
 public class UserProfilePic {
     private String fileId;
     private String smallFileId;
+    private String generatedFileUrl;
+    private String smallGeneratedFileUrl;
 }

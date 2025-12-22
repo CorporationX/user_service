@@ -75,6 +75,14 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
+    public List<Long> getIdsActiveUsers(int limit) {
+        return userRepository.findAllUser(limit);
+    }
+
+    public List<Long> getAllUsers(Integer limit) {
+        return userRepository.findAllUser(limit);
+    }
+
     private void validateUserPassword(UserCreateDto userDto) {
         if (userDto.password().length() < minPasswordLength) {
             throw new DataValidationException("Пароль не может быть более чем " + minPasswordLength + " символов!");

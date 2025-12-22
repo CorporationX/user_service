@@ -67,6 +67,20 @@ public interface UserService {
      */
     List<UserViewDto> getByIds(List<Long> userIds);
 
+    /**
+     * Метод для получения id пользователей (с фиксированным кол-вом)
+     *
+     * @param limit кол-во пользователей для получения
+     * @return список id пользователей
+     */
+    List<Long> getIdsActiveUsers(int limit);
+
+    /**
+     * Метод для получения всех id пользователей
+     *
+     * @return список всех id пользователей
+     */
+    List<Long> getAllUsers(Integer limit);
 }
 
 

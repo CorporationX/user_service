@@ -2,6 +2,7 @@ package school.faang.user_service.repository.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.EntityNotFoundException;
 
@@ -51,4 +52,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
                         () -> new EntityNotFoundException(String.format("Пользователь id=%d не был найден", userId))
                 );
     }
+
+    @Query(nativeQuery = true, value = """
+            SELECT id FROM users
+            LIMIT :limit
+            """)
+    List<Long> findAllUser(@Param("limit") int limit);
 }

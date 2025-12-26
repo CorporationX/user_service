@@ -14,7 +14,8 @@ public interface StudentCsvRowMapper {
 
     @Mapping(target = "contactInfo", source = ".")
     @Mapping(target = "educations", expression = "java(java.util.Collections.singletonList(toEducation(row)))")
-    @Mapping(target = "previousEducation", expression = "java(java.util.Collections.singletonList(toPreviousEducation(row)))")
+    @Mapping(target = "previousEducation",
+            expression = "java(java.util.Collections.singletonList(toPreviousEducation(row)))")
     Person toPerson(StudentCsvRow row);
 
     @Mapping(target = "address", source = ".")

@@ -3,6 +3,7 @@ package school.faang.user_service.service.user;
 import com.fasterxml.jackson.databind.MappingIterator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,15 +11,12 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.CreateUserDto;
 import school.faang.user_service.dto.user.UpdateUserDto;
 import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.entity.person.ContactInfo;
-import school.faang.user_service.entity.person.Education;
 import school.faang.user_service.entity.person.Person;
-import school.faang.user_service.entity.person.PreviousEducation;
-import school.faang.user_service.entity.person.Address;
 import school.faang.user_service.entity.user.Country;
 import school.faang.user_service.entity.user.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ForbiddenException;
+import school.faang.user_service.mapper.StudentCsvRowMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.csvmapper.StudentCsvRow;
 import school.faang.user_service.repository.user.CountryRepository;
@@ -32,7 +30,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -46,6 +43,7 @@ public class UserServiceImpl implements UserService {
     private final CountryRepository countryRepository;
     private final UserMapper userMapper;
     private final UserContext userContext;
+    private final StudentCsvRowMapper studentCsvRowMapper = Mappers.getMapper(StudentCsvRowMapper.class);
 
     @Override
     public UserDto create(CreateUserDto userDto) {
@@ -98,9 +96,8 @@ public class UserServiceImpl implements UserService {
         List<UserDto> userDtos = new ArrayList<>();
 
         CsvMapper csvMapper = new CsvMapper();
-        CsvSchema schema = CsvSchema.emptySchema().withHeader(); // с заголовками в первой строке
+        CsvSchema schema = CsvSchema.emptySchema().withHeader();
 
-        // Маппим все строки файла в объекты StudentCsvRow
         try (
                 InputStream input = file.getInputStream();
                 Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8)
@@ -111,41 +108,7 @@ public class UserServiceImpl implements UserService {
             while (it.hasNext()) {
                 StudentCsvRow row = it.next();
 
-                // Cоздание Person и прочее ― как у вас, только заменяете values[индекс] на row.getXxx()
-                Person person = new Person();
-                person.setFirstName(row.getFirstName());
-                person.setLastName(row.getLastName());
-                person.setYearOfBirth(row.getYearOfBirth());
-                person.setGroup(row.getGroup());
-                person.setStudentId(row.getStudentId());
-
-                ContactInfo contactInfo = new ContactInfo();
-                contactInfo.setEmail(row.getEmail());
-                contactInfo.setPhone(row.getPhone());
-
-                Address address = new Address(row.getStreet(), row.getCity(),
-                        row.getRegion(), row.getZip(), row.getCountry());
-                contactInfo.setAddress(address);
-                person.setContactInfo(contactInfo);
-
-                Education education = new Education(
-                        row.getDegreeName(),
-                        row.getDegreeYear(),
-                        row.getInstitution(),
-                        row.getGpa()
-                );
-                person.setEducations(Collections.singletonList(education));
-
-                person.setStatus(row.getStatus());
-                person.setAdmissionDate(row.getAdmissionDate());
-                person.setGraduationDate(row.getGraduationDate());
-                person.setPreviousEducation(
-                        Collections.singletonList(
-                                new PreviousEducation(row.getPrevDegName(), row.getPrevInstitution(), row.getPrevYear())
-                        )
-                );
-                person.setScholarship(row.getScholarship());
-                person.setEmployer(row.getEmployer());
+                Person person = studentCsvRowMapper.toPerson(row);
 
                 User user = userMapper.personToUser(person);
                 String password = PasswordUtils.generatePassword(minPasswordLength);
@@ -159,7 +122,6 @@ public class UserServiceImpl implements UserService {
                             return countryRepository.save(c);
                         });
                 user.setCountry(country);
-
                 userRepository.save(user);
 
                 UserDto userDto = convertToUserDto(person);

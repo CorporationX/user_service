@@ -18,6 +18,6 @@ public class MentorshipRequestRequesterIdFilter implements MentorshipRequestFilt
     public Stream<MentorshipRequest> apply(Stream<MentorshipRequest> mentorshipRequests,
                                            MentorshipRequestFilterDto filter) {
         return mentorshipRequests
-                .filter(user -> filter.requesterId() == user.getId());
+                .filter(request -> filter.requesterId().equals(request.getRequester().getId()));
     }
 }

@@ -84,4 +84,12 @@ public interface UserSubscriptionService {
      * @return список {@link UserDto}, представляющих подписки
      */
     List<UserDto> getFollowees(long followerId, UserFiltersDto filters);
+
+    /**
+     * Возвращает ID подписчиков указанного пользователя
+     *
+     * @param followeeId ID пользователя, ID подписчиков которого нужно получить
+     * @return список ID подписчиков
+     */
+    List<Long> getFollowersIdsByFolloweeId(long followeeId);
 }

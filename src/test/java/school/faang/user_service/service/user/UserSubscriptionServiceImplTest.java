@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import school.faang.user_service.dto.user.UserDto;
@@ -373,5 +372,31 @@ class UserSubscriptionServiceImplTest {
             return stream.filter(user -> user.getExperience() >= filters.experienceMin()
                     && user.getExperience() <= filters.experienceMax());
         });
+    }
+
+    // -------------------------------------------------
+    // getFollowersIdsByFolloweeId()
+    // -------------------------------------------------
+    @Test
+    public void testGetFollowersIds_ReturnsCorrectIds() {
+        List<Long> expectedIds = List.of(10L, 20L, 30L, 40L);
+        when(subscriptionRepository.findFollowersIdsByFolloweeId(followeeId)).thenReturn(expectedIds);
+
+        List<Long> actualIds = service.getFollowersIdsByFolloweeId(followeeId);
+
+        assertEquals(expectedIds, actualIds);
+        assertEquals(4, actualIds.size());
+        verify(subscriptionRepository).findFollowersIdsByFolloweeId(followeeId);
+    }
+
+    @Test
+    public void testGetFollowersIds_ReturnsEmptyList() {
+        List<Long> emptyList = List.of();
+        when(subscriptionRepository.findFollowersIdsByFolloweeId(followeeId)).thenReturn(emptyList);
+
+        List<Long> actualIds = service.getFollowersIdsByFolloweeId(followeeId);
+
+        assertTrue(actualIds.isEmpty());
+        verify(subscriptionRepository).findFollowersIdsByFolloweeId(followeeId);
     }
 }

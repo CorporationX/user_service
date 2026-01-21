@@ -8,8 +8,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.user.SubscriptionRepository;
+import school.faang.user_service.service.user.UserSubscriptionService;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -20,6 +25,9 @@ public class UserSubscriptionControllerTest {
 
     @Mock
     private SubscriptionRepository subscriptionRepository;
+
+    @Mock
+    private UserSubscriptionService userSubscriptionService;
 
     @Mock
     private UserContext userContext;
@@ -52,5 +60,33 @@ public class UserSubscriptionControllerTest {
         assertThrows(DataValidationException.class, () -> controller.unfollowUser(followeeId));
 
         verify(subscriptionRepository, never()).unfollowUser(anyLong(), anyLong());
+    }
+
+    @Test
+    public void testGetFollowersIds() {
+        followeeId = 1L;
+        List<Long> expectedIds = List.of(10L, 20L, 30L);
+
+        when(userSubscriptionService.getFollowersIdsByFolloweeId(followeeId))
+                .thenReturn(expectedIds);
+
+        List<Long> actualIds = controller.getFollowersIds(followeeId);
+
+        assertEquals(expectedIds, actualIds);
+        verify(userSubscriptionService).getFollowersIdsByFolloweeId(followeeId);
+    }
+
+    @Test
+    public void testGetFollowersIdsEmpty() {
+        followeeId = 1L;
+        List<Long> emptyList = List.of();
+
+        when(userSubscriptionService.getFollowersIdsByFolloweeId(followeeId))
+                .thenReturn(emptyList);
+
+        List<Long> actualIds = controller.getFollowersIds(followeeId);
+
+        assertTrue(actualIds.isEmpty());
+        verify(userSubscriptionService).getFollowersIdsByFolloweeId(followeeId);
     }
 }

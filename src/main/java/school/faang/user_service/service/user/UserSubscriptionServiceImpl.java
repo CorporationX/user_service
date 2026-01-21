@@ -72,6 +72,14 @@ public class UserSubscriptionServiceImpl implements UserSubscriptionService {
         return processUserStream(users, filters);
     }
 
+    @Override
+    public List<Long> getFollowersIdsByFolloweeId(long followeeId) {
+        log.info("Получение ID подписчиков пользователя {}", followeeId);
+        List<Long> followersIds = subscriptionRepository.findFollowersIdsByFolloweeId(followeeId);
+        log.info("Найдено {} ID подписчиков пользователя {}", followersIds.size(), followeeId);
+        return followersIds;
+    }
+
     // ---------------------
     // Методы проверок
     // ---------------------

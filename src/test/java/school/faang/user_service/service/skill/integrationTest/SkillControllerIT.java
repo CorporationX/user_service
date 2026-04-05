@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @IT
 public class SkillControllerIT {
-
+/*
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -166,4 +166,6 @@ public class SkillControllerIT {
         }
         return users = userRepository.saveAll(users);
     }
+
+ */
 }

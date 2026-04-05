@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("{userId}/exists")
-    public ResponseEntity<Void> checkUserExists(@PathVariable long userId){
+    public ResponseEntity<Void> checkUserExists(@PathVariable long userId) {
         return userService.checkUserExists(userId);
     }
 }

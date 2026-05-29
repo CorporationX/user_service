@@ -24,8 +24,14 @@ public class SkillController {
         return skillService.create(skillDto);
     }
 
-    @GetMapping("/{userId}")
-    public List<SkillDto> getByUserId(@PathVariable Long userId) {
-        return skillService.getByUserId(userId);
+    @GetMapping("/{userId}/assigned")
+    public List<SkillDto> getAssignedSkills(@PathVariable Long userId) {
+        return skillService.getAssignedSkills(userId);
+    }
+
+    //todo необходимо добавить реализацию в сервисе
+    @GetMapping("/{userId}/offered")
+    public List<SkillDto> getOfferedSkills(@PathVariable Long userId) {
+        return skillService.getOfferedSkills(userId);
     }
 }

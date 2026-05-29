@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface SkillService {
     SkillDto create(CreateSkillDto skillDto);
-    List<SkillDto> getByUserId(Long userId);
+    List<SkillDto> getAssignedSkills(Long userId);
 }

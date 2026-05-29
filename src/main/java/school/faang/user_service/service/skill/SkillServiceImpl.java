@@ -2,13 +2,13 @@ package school.faang.user_service.service.skill;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.skill.CreateSkillDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.user.Skill;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.user.SkillRepository;
 import school.faang.user_service.validator.skill.SkillValidator;
+import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public class SkillServiceImpl implements SkillService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
     private final SkillValidator skillValidator;
-    private final UserContext userContext;
+    private final UserValidator userValidator;
 
     @Override
     public SkillDto create(CreateSkillDto skillDto) {
@@ -31,8 +31,9 @@ public class SkillServiceImpl implements SkillService {
     }
 
     @Override
-    public List<SkillDto> getByUserId(Long userId) {
-        userId = userContext.getUserId();
+    public List<SkillDto> getAssignedSkills(Long userId) {
+        userValidator.validateUserCompliance(userId);
+
         List<Skill> userSkills = skillRepository.findAllByUserId(userId);
 
         return skillMapper.toSkillDtoList(userSkills);

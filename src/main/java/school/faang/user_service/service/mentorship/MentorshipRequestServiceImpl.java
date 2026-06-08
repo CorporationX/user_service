@@ -1,5 +1,6 @@
 package school.faang.user_service.service.mentorship;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,7 +72,8 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
     private void acceptRequestMentorship(MentorshipRequest mentorshipRequest) {
         User mentor = mentorshipRequest.getReceiver();
-        mentorshipRequest.getRequester().getMentors().add(mentor);
+        User requester = mentorshipRequest.getRequester();
+        mentor.getMentees().add(requester);
         mentorshipRequest.setStatus(ACCEPTED);
         mentorshipRequestRepository.save(mentorshipRequest);
     }
@@ -141,9 +143,18 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         }
     }
 
-    private MentorshipRequest createRequestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        return mentorshipRequestRepository.create(mentorshipRequestDto.getRequesterId(),
-                mentorshipRequestDto.getReceiverId(),
-                mentorshipRequestDto.getDescription());
+    private MentorshipRequest createRequestMentorship(MentorshipRequestDto dto) {
+        User requester = userRepository.findById(dto.getRequesterId())
+                .orElseThrow(() -> new EntityNotFoundException("Requester not found"));
+        User receiver = userRepository.findById(dto.getReceiverId())
+                .orElseThrow(() -> new EntityNotFoundException("Receiver not found"));
+
+        MentorshipRequest request = new MentorshipRequest();
+        request.setRequester(requester);
+        request.setReceiver(receiver);
+        request.setDescription(dto.getDescription());
+        request.setStatus(RequestStatus.PENDING);
+
+        return mentorshipRequestRepository.save(request);
     }
 }

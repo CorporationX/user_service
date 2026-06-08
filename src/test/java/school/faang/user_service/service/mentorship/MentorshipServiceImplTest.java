@@ -10,7 +10,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.users.UserDto;
 import school.faang.user_service.entity.User;
-//import school.faang.user_service.mapper.MentorshipMapperImpl;
 import school.faang.user_service.mapper.mentorship.MentorshipMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.impl.MentorshipServiceImpl;
@@ -194,44 +193,44 @@ public class MentorshipServiceImplTest {
     @Test
     public void test_deleteMentee_ThrowsEntityNotFoundException_whenMenteeNotFound() {
         User mentor = new User();
-        mentor.setId(3L);
+        mentor.setId(1L);
         mentor.setMentees(new ArrayList<>());
 
-        Mockito.when(mentorshipRepository.findById(Mockito.eq(3L))).thenReturn(Optional.of(mentor));
+        Mockito.when(mentorshipRepository.findById(Mockito.eq(1L))).thenReturn(Optional.of(mentor));
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.deleteMentee(1L, 3L));
 
-        assertEquals("Менти с ID 1 не найден у ментора с ID 3", exception.getMessage());
+        assertEquals("Менти с ID 3 не найден у ментора с ID 1", exception.getMessage());
 
-        Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(3L);
+        Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(1L);
         Mockito.verify(mentorshipRepository, Mockito.never()).save(Mockito.any());
     }
 
     @Test
     public void test_deleteMentee_ThrowsEntityNotFoundException_whenMentorNotFound() {
-        Mockito.when(mentorshipRepository.findById(Mockito.eq(3L))).thenReturn(Optional.empty());
+        Mockito.when(mentorshipRepository.findById(Mockito.eq(1L))).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.deleteMentee(1L, 3L));
 
-        assertEquals("Ментор с ID 3 не найден", exception.getMessage());
+        assertEquals("Ментор с ID 1 не найден", exception.getMessage());
 
-        Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(3L);
+        Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(1L);
         Mockito.verify(mentorshipRepository, Mockito.never()).save(Mockito.any());
     }
 
     @Test
     public void test_deleteMentee_whenMenteeFound() {
         User mentor = new User();
-        mentor.setId(3L);
+        mentor.setId(1L);
         mentor.setMentees(new ArrayList<>());
 
         User mentee = new User();
-        mentee.setId(1L);
+        mentee.setId(3L);
         mentor.getMentees().add(mentee);
 
-        Mockito.when(mentorshipRepository.findById(Mockito.eq(3L))).thenReturn(Optional.of(mentor));
+        Mockito.when(mentorshipRepository.findById(Mockito.eq(1L))).thenReturn(Optional.of(mentor));
 
         mentorshipService.deleteMentee(1L, 3L);
 
@@ -240,50 +239,49 @@ public class MentorshipServiceImplTest {
     }
 
     @Test
-    public void test_deleteMentor_ThrowsEntityNotFoundException_whenMenteeNotFound() {
-        Mockito.when(mentorshipRepository.findById(Mockito.eq(1L))).thenReturn(Optional.empty());
+    public void test_deleteMentor_ThrowsEntityNotFoundException_whenMentorNotFound() {
+        Mockito.when(mentorshipRepository.findById(Mockito.eq(2L))).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-                () -> mentorshipService.deleteMentor(1L, 3L));
+                () -> mentorshipService.deleteMentor(1L, 2L));
 
-        assertEquals("Менти с ID 1 не найден", exception.getMessage());
+        assertEquals("Ментор с ID 2 не найден", exception.getMessage());
 
-        Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(1L);
+        Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(2L);
         Mockito.verify(mentorshipRepository, Mockito.never()).save(Mockito.any());
     }
 
     @Test
-    public void test_deleteMentor_ThrowsEntityNotFoundException_whenMentorNotFound() {
+    public void test_deleteMentor_ThrowsEntityNotFoundException_whenMenteeNotFoundInMentorList() {
         User mentee = new User();
-        mentee.setId(1L);
+        mentee.setId(3L);
         mentee.setMentors(new ArrayList<>());
 
-        Mockito.when(mentorshipRepository.findById(Mockito.eq(1L))).thenReturn(Optional.of(mentee));
+        Mockito.when(mentorshipRepository.findById(Mockito.eq(3L))).thenReturn(Optional.of(mentee));
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.deleteMentor(1L, 3L));
 
-        assertEquals("Ментор с ID 3 не найден у менти с ID 1", exception.getMessage());
+        assertEquals("Менти с ID 1 не найден у ментора с ID 3", exception.getMessage());
 
-        Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(1L);
+        Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(3L);
         Mockito.verify(mentorshipRepository, Mockito.never()).save(Mockito.any());
     }
 
     @Test
     public void test_deleteMentor_whenMentorFound() {
-        User mentor = new User();
-        mentor.setId(3L);
-        mentor.setMentees(new ArrayList<>());
-
         User mentee = new User();
         mentee.setId(1L);
-        mentee.setMentors(new ArrayList<>(List.of(mentor)));
 
-        Mockito.when(mentorshipRepository.findById(Mockito.eq(1L))).thenReturn(Optional.of(mentee));
+        User mentor = new User();
+        mentor.setId(3L);
+        mentor.setMentees(new ArrayList<>(List.of(mentee)));
+
+        Mockito.when(mentorshipRepository.findById(Mockito.eq(3L))).thenReturn(Optional.of(mentor));
 
         mentorshipService.deleteMentor(1L, 3L);
 
-        assertTrue(mentee.getMentors().isEmpty());
-        Mockito.verify(mentorshipRepository, Mockito.times(1)).save(mentee);
+        assertTrue(mentor.getMentees().isEmpty());
+        Mockito.verify(mentorshipRepository, Mockito.times(1)).save(mentor);
     }
 }

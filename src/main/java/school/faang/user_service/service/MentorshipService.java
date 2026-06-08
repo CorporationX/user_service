@@ -10,7 +10,7 @@ public interface MentorshipService {
 
     List<UserDto> getMentors(long userId);
 
-    void deleteMentee(long menteeId, long mentorId);
+    void deleteMentee(long userId, long menteeId);
 
-    void deleteMentor(long menteeId, long mentorId);
+    void deleteMentor(long userId, long mentorId);
 }

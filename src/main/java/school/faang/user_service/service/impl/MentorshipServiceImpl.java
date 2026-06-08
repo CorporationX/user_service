@@ -3,6 +3,7 @@ package school.faang.user_service.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.users.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.mentorship.MentorshipMapper;
@@ -33,38 +34,34 @@ public class MentorshipServiceImpl implements MentorshipService {
     }
 
     @Override
-    public void deleteMentee(long menteeId, long mentorId) {
-        User mentor = mentorshipRepository.findById(mentorId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Ментор с ID %s не найден", mentorId)));
+    @Transactional
+    public void deleteMentee(long userId, long menteeId) {
+        User mentor = mentorshipRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Ментор с ID %s не найден", userId)));
 
-        User userMentee = mentor.getMentees()
-                .stream()
-                .filter(mentee -> mentee.getId() == menteeId)
-                .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Менти с ID %s не найден у ментора с ID %s", menteeId, mentorId)
-                ));
+        boolean removed = mentor.getMentees().removeIf(mentee -> mentee.getId() == menteeId);
 
-        mentor.getMentees().remove(userMentee);
+        if (!removed) {
+            throw new EntityNotFoundException(
+                    String.format("Менти с ID %s не найден у ментора с ID %s", menteeId, userId));
+        }
 
         mentorshipRepository.save(mentor);
     }
 
     @Override
-    public void deleteMentor(long menteeId, long mentorId) {
-        User mentee = mentorshipRepository.findById(menteeId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Менти с ID %s не найден", menteeId)));
+    @Transactional
+    public void deleteMentor(long userId, long mentorId) {
+        User mentor = mentorshipRepository.findById(mentorId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Ментор с ID %s не найден", mentorId)));
 
-        User userMentor = mentee.getMentors()
-                .stream()
-                .filter(mentor -> mentor.getId() == mentorId)
-                .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Ментор с ID %s не найден у менти с ID %s", mentorId, menteeId)
-                ));
+        boolean removed = mentor.getMentees().removeIf(mentee -> mentee.getId() == userId);
 
-        mentee.getMentors().remove(userMentor);
+        if (!removed) {
+            throw new EntityNotFoundException(
+                    String.format("Менти с ID %s не найден у ментора с ID %s", userId, mentorId));
+        }
 
-        mentorshipRepository.save(mentee);
+        mentorshipRepository.save(mentor);
     }
 }

@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -126,11 +127,18 @@ public class MentorshipRequestServiceImplTest {
     public void testCreateMentorshipRequest() {
         MentorshipRequestDto mentorshipRequestDto = prepareDataForLastRequest(LocalDateTime.now().minusMonths(6));
 
+        User requester = new User();
+        requester.setId(REQUESTER_ID);
+        User receiver = new User();
+        receiver.setId(RECEIVER_ID);
+
+        when(userRepository.findById(REQUESTER_ID)).thenReturn(Optional.of(requester));
+        when(userRepository.findById(RECEIVER_ID)).thenReturn(Optional.of(receiver));
+
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
+
         verify(mentorshipRequestRepository, Mockito.times(NUMBER_INVOCATION))
-                .create(mentorshipRequestDto.getRequesterId(),
-                        mentorshipRequestDto.getReceiverId(),
-                        mentorshipRequestDto.getDescription());
+                .save(any(MentorshipRequest.class));
     }
 
     @Test

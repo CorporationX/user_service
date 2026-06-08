@@ -97,14 +97,14 @@ public class User {
     @OneToMany(mappedBy = "owner")
     private List<Event> ownedEvents;
 
-    @ManyToMany(mappedBy = "mentors")
-    private List<User> mentees = new ArrayList<>();
+    @ManyToMany(mappedBy = "mentees")
+    private List<User> mentors = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(name = "mentorship",
-            joinColumns = @JoinColumn(name = "mentee_id"),
-            inverseJoinColumns = @JoinColumn(name = "mentor_id"))
-    private List<User> mentors;
+            joinColumns = @JoinColumn(name = "mentor_id"),
+            inverseJoinColumns = @JoinColumn(name = "mentee_id"))
+    private List<User> mentees = new ArrayList<>();
 
     @OneToMany(mappedBy = "receiver")
     private List<MentorshipRequest> receivedMentorshipRequests;

@@ -56,6 +56,7 @@ public class UserAvatarServiceImpl implements UserAvatarService {
 
             user.setUserProfilePic(new UserProfilePic(largeAvatarKey, smallAvatarKey));
             userRepository.save(user);
+            log.info("Avatar upload completed successfully for user id: {}", userId);
 
             return new UploadAvatarResponseDto(largeAvatarKey, smallAvatarKey);
 
@@ -155,6 +156,9 @@ public class UserAvatarServiceImpl implements UserAvatarService {
                 isSmall
                         ? user.getUserProfilePic().getSmallFileId()
                         : user.getUserProfilePic().getFileId();
+
+        log.info("Downloading {} avatar from S3, key: {}, user id: {}",
+                isSmall ? "small" : "large", avatarKey, userId);
 
         S3Object s3Object = s3Client.getObject(s3Properties.getBucketName(), avatarKey);
         return new InputStreamResource(s3Object.getObjectContent());
